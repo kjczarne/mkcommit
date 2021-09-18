@@ -33,18 +33,19 @@ class TestValidators(unittest.TestCase):
         )
 
         return c_invalid
-    
+
     def test_validators_valid(self):
         """Correctly validated fixture should have no invalid text"""
         msg = self.make_valid().first_line
         invalid_bits = re.findall(r'INVALID', msg)
         self.assertEqual(0, len(invalid_bits))
-    
+
     def test_validators_invalid(self):
         """Each invalid input should properly add `INVALID-` fixture prefix."""
         msg = self.make_invalid().first_line
         invalid_bits = re.findall(r'INVALID', msg)
         self.assertEqual(4, len(invalid_bits))
+
 
 if __name__ == "__main__":
     unittest.main()
