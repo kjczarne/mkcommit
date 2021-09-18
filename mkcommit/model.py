@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, Callable, List, Optional
 from InquirerPy import inquirer
 from dataclasses import dataclass
 
@@ -20,6 +20,10 @@ class FailedToFindCommitMessageException(Exception):
 
 
 class ModuleLoaderException(Exception):
+    pass
+
+
+class ValidationFailedException(Exception):
     pass
 
 
@@ -51,15 +55,19 @@ class CommitMessage:
 
 
 Question = str
+Validator = Callable[[str], bool]
+ValidatorClosure = Callable[..., Validator]
 
 
 def ask(
     question: Question,
     one_of: Optional[List[Any]] = None,
     one_or_more: Optional[List[Any]] = None,
-    yes_no: bool = False
-):
+    yes_no: bool = False,
+    check: Optional[Validator] = None
+) -> Any:
 
+    result = None
     if one_of:
         if one_or_more or yes_no:
             raise QuestionConflictException(
@@ -67,7 +75,7 @@ def ask(
                 f"when calling `ask`. The args are: `one_of`:{one_of}, "
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
-        return inquirer.select(question, one_of).execute()
+        result = inquirer.select(question, one_of).execute()
     if one_or_more:
         if one_of or yes_no:
             raise QuestionConflictException(
@@ -75,7 +83,7 @@ def ask(
                 f"when calling `ask`. The args are: `one_of`:{one_of}, "
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
-        return inquirer.checkbox(question, one_or_more).execute()
+        result = inquirer.checkbox(question, one_or_more).execute()
     if yes_no:
         if one_of or one_or_more:
             raise QuestionConflictException(
@@ -83,5 +91,15 @@ def ask(
                 f"when calling `ask`. The args are: `one_of`:{one_of}, "
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
-        return inquirer.confirm(question).execute()
-    return inquirer.text(question).execute()
+        result = inquirer.confirm(question).execute()
+    result = inquirer.text(question).execute()
+
+    if check:
+        if check(result):
+            return result
+        else:
+            raise ValidationFailedException(
+                f"Question: {question}, validator: {check.__name__}"
+            )
+    else:
+        return result
