@@ -1,4 +1,4 @@
-from mkcommit import Keyword, CommitMessage, ask, to_stdout
+from mkcommit import Keyword, CommitMessage, to_stdout
 from mkcommit.fixtures import _ask
 
 keywords = [

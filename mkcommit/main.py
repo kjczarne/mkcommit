@@ -1,7 +1,6 @@
 import argparse
 import glob
-import os
-from typing import Callable, Optional, Type, Union
+from typing import Callable, Optional, Union
 from InquirerPy import inquirer
 from enum import Enum
 import importlib.util
@@ -9,7 +8,10 @@ import inspect
 import sys
 import pyperclip
 
-from mkcommit.model import CommitMessage, FailedToFindCommitMessageException, Keyword, ModuleLoaderException, WrongModeException, ask, NoFilesFoundException
+from mkcommit.model import (
+    CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException,
+    WrongModeException, NoFilesFoundException
+)
 
 
 class Mode(Enum):
@@ -43,7 +45,7 @@ def _main(
         module_shim,
         file
     )
-    
+
     if spec:
         cfg_module = importlib.util.module_from_spec(spec)
         if spec.loader:
@@ -55,11 +57,11 @@ def _main(
         sys.modules[module_shim] = cfg_module
     else:
         raise ModuleLoaderException(f"Could not load module located at {file}")
-    
+
     for name, obj in inspect.getmembers(sys.modules[module_shim]):
         if isinstance(obj, CommitMessage):
             commit_message_instance = obj
-    
+
     if commit_message_instance is None:
         raise FailedToFindCommitMessageException(
             f"Module {file} seems to not declare any instance "
@@ -76,20 +78,20 @@ def _main(
 
 def main():
     parser = argparse.ArgumentParser(description="mkcommit")
-    
+
     # subparsers = parser.add_subparsers()
     # parser_mk = subparsers.add_parser("mk", help="Create commit messages from templates")
     # parser_lint = subparsers.add_parser("lint", help="Lint a commit message")
     # parser_config = subparsers.add_parser("config", help="Configure `mkcommit`")
 
     parser.add_argument('-c', '--clipboard',
-        action='store_true', help="Send message to the clipboard instead of STDOUT")
+                        action='store_true', help="Send message to the clipboard instead of STDOUT")
     parser.add_argument('-f', '--file',
-        type=str, help="Path to the commit config file. Must be a Python file named "
-                       "with `*.mkcommit.py` extension and declaring an instance of "
-                       "`mkcommit.CommitMessage` class."
-    )
-    
+                        type=str, help="Path to the commit config file. Must be a "
+                        "Python file with `*.mkcommit.py` extension and declaring an instance of "
+                        "`mkcommit.CommitMessage` class."
+                        )
+
     args = parser.parse_args()
 
     if args.clipboard:
@@ -103,7 +105,8 @@ def main():
         mkcommit_files = glob.glob("*.mkcommit.py")
         if len(mkcommit_files) == 0:
             raise NoFilesFoundException("No `*.mkcommit.py` files found")
-        selected_file = inquirer.select("Select one of the following files I've found", mkcommit_files).execute()
+        selected_file = inquirer.select(
+            "Select one of the following files I've found", mkcommit_files).execute()
         if type(selected_file) is str:
             _main(selected_file, mode)
         else:

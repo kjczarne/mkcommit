@@ -59,7 +59,7 @@ def ask(
     one_or_more: Optional[List[Any]] = None,
     yes_no: bool = False
 ):
-    
+
     if one_of:
         if one_or_more or yes_no:
             raise QuestionConflictException(

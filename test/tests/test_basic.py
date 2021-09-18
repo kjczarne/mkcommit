@@ -30,7 +30,7 @@ class TestBasic(unittest.TestCase):
 
         self.assertEqual(len(clipboard_writes), 0)
         self.assertEqual(len(stdout_writes), 1)
-    
+
     def test_basic_file_config_clipboard(self):
         _main(
             self.path,
