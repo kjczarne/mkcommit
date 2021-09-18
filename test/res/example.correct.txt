@@ -1,0 +1,4 @@
+[KrCz/MYPROJECT-1234] feat: cool
+[KrCz/MYPROJECT-1234] fix: cool
+[KrCz/-] feat: cool
+[KrCz/-] fix: cool
