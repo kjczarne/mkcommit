@@ -1,7 +1,7 @@
 import argparse
 import glob
 import os
-from typing import Optional, Type, Union
+from typing import Callable, Optional, Type, Union
 from InquirerPy import inquirer
 from enum import Enum
 import importlib.util
@@ -31,7 +31,12 @@ def to_clipboard(msg: Union[str, CommitMessage]):
         pyperclip.copy(msg)
 
 
-def _main(file: str, mode: Mode):
+def _main(
+    file: str,
+    mode: Mode,
+    to_stdout: Callable[[Union[str, CommitMessage]], None] = to_stdout,
+    to_clipboard: Callable[[Union[str, CommitMessage]], None] = to_clipboard
+):
     commit_message_instance: Optional[CommitMessage] = None
     module_shim = "mkcommit.loaded_config"
     spec = importlib.util.spec_from_file_location(
