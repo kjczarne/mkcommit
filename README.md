@@ -66,3 +66,44 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 3. Run `mkcommit`. You can either:
     - Run it as `mkcommit -f /path/to/some.mkcommit.py`
     - Or trigger it in the current working directory. `mkcommit` will search for all `*.mkcommit.py` files and will let you select the one applicable from the list (this way you can have many config files for many diverse scenarios if you so forsee).
+
+### Input validation
+
+Right now, we're offering the following options for input validation:
+
+- `mkcommit.validators.is_int` - validates input as integers
+- `mkcommit.validators.is_float` - validates input as floating-point numbers
+- `mkcommit.validators.max_len` - raises a validation error if maximum length is exceeded
+- `mkcommit.validators.matches` - matches an arbitrary regex pattern
+
+Example of usage:
+
+```python
+from mkcommit import Keyword, CommitMessage, ask
+from mkcommit.validators import is_int, matches
+
+ticket_number = ask("Ticket number", is_int())    # integer ticket number
+initials = ask("Initials", matches(r'\w\w\w\w'))  # 4-letter initials
+```
+
+#### Writing your own validators
+
+It is possible to quickly write your own validators. You need to create a function with a signature that matches `mkcommit.model.ValidatorClosure`, so a function that returns another function, where the inner function accepts a string and returns a boolean. Quick example:
+
+```python
+from mkcommit.model import Validator
+import re
+
+
+def matches(pattern: str) -> Validator:
+    def _v(msg: str) -> bool:
+        if re.match(pattern, msg):
+            return True
+        else:
+            return False
+    return _v
+```
+
+The above is the implementation of the `matches` validator.
+
+You can declare validators directly within your `*.mkcommit.py` file or import them from somewhere else.

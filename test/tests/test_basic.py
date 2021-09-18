@@ -17,7 +17,7 @@ class TestBasic(unittest.TestCase):
         )
 
     def test_basic_file_config_stdout(self):
-
+        """Test whether STDOUT write works properly"""
         stdout_writes = []
         clipboard_writes = []
 
@@ -32,6 +32,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(len(stdout_writes), 1)
 
     def test_basic_file_config_clipboard(self):
+        """Test whether Clipboard write works properly"""
         _main(
             self.path,
             Mode.CLIPBOARD
