@@ -11,6 +11,18 @@ class NoFilesFoundException(Exception):
     pass
 
 
+class WrongModeException(Exception):
+    pass
+
+
+class FailedToFindCommitMessageException(Exception):
+    pass
+
+
+class ModuleLoaderException(Exception):
+    pass
+
+
 @dataclass
 class Text:
     text: str
