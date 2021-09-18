@@ -61,9 +61,9 @@ def _main(file: str, mode: Mode):
             "of a `CommitMessage` class. Did you forget to instantiate?"
         )
     else:
-        if mode.STDOUT:
+        if mode == mode.STDOUT:
             to_stdout(commit_message_instance)
-        elif mode.CLIPBOARD:
+        elif mode == mode.CLIPBOARD:
             to_clipboard(commit_message_instance)
         else:
             raise WrongModeException(f"You've used invalid mode: {mode}")
