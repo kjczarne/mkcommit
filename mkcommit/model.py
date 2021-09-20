@@ -31,6 +31,10 @@ class InvalidStateException(Exception):
     pass
 
 
+class PlatformUnsupportedException(Exception):
+    pass
+
+
 @dataclass
 class Text:
     text: str
