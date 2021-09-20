@@ -72,7 +72,9 @@ def ask(
 ) -> Any:
 
     result = None
+    stepped_in_flag = False
     if one_of:
+        stepped_in_flag = True
         if one_or_more or yes_no:
             raise QuestionConflictException(
                 "Check your `ask` calls. You should only use one extra arg "
@@ -81,6 +83,7 @@ def ask(
             )
         result = inquirer.select(question, one_of).execute()
     if one_or_more:
+        stepped_in_flag = True
         if one_of or yes_no:
             raise QuestionConflictException(
                 "Check your `ask` calls. You should only use one extra arg "
@@ -89,6 +92,7 @@ def ask(
             )
         result = inquirer.checkbox(question, one_or_more).execute()
     if yes_no:
+        stepped_in_flag = True
         if one_of or one_or_more:
             raise QuestionConflictException(
                 "Check your `ask` calls. You should only use one extra arg "
@@ -96,10 +100,10 @@ def ask(
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
         result = inquirer.confirm(question).execute()
-    if one_of is None and one_or_more is None and not yes_no:
+    if not stepped_in_flag:
         result = inquirer.text(question).execute()
 
-    if result:
+    if result is not None:
         if check:
             if check(result):
                 return result
