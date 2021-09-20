@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, List, Optional, Tuple
 from InquirerPy import inquirer
 from dataclasses import dataclass
 
@@ -40,6 +40,24 @@ class Text:
 class Keyword:
     keyword: str
     description: str
+
+
+@dataclass(init=False)
+class CommaSeparatedList:
+    
+    def __init__(self, *args, no_space: bool=False):
+        self.elements: Tuple[Any, ...] = args
+        self.no_space: bool = no_space
+    
+    def __repr__(self) -> str:
+        # join with commas and spaces and cut off last two
+        if self.no_space:
+            return "".join([str(i) + "," for i in self.elements])[:-1]
+        else:
+            return "".join([str(i) + ", " for i in self.elements])[:-2]
+    
+    def __str__(self) -> str:
+        return self.__repr__()
 
 
 FirstLine = str
