@@ -27,6 +27,10 @@ class ValidationFailedException(Exception):
     pass
 
 
+class InvalidStateException(Exception):
+    pass
+
+
 @dataclass
 class Text:
     text: str
@@ -92,14 +96,22 @@ def ask(
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
         result = inquirer.confirm(question).execute()
-    result = inquirer.text(question).execute()
+    if one_of is None and one_or_more is None and not yes_no:
+        result = inquirer.text(question).execute()
 
-    if check:
-        if check(result):
-            return result
+    if result:
+        if check:
+            if check(result):
+                return result
+            else:
+                raise ValidationFailedException(
+                    f"Question: {question}, validator: {check.__doc__}"
+                )
         else:
-            raise ValidationFailedException(
-                f"Question: {question}, validator: {check.__name__}"
-            )
+            return result
     else:
-        return result
+        raise InvalidStateException(
+            "Invalid state on `ask`: "
+            f"one_or_more={one_or_more}, one_of={one_of}, yes_no={yes_no}, "
+            f"check={check}"
+        )
