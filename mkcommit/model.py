@@ -125,6 +125,7 @@ def ask(
     if not stepped_in_flag:
         result = inquirer.text(question).execute()
 
+    # WARNING: do not refactor as `if result`, will fail!!!
     if result is not None:
         if check:
             if check(result):

@@ -55,6 +55,8 @@ def validate_initials(first_name_chars: int, last_name_chars: int) -> Validator:
                 print(msg[first_name_chars:first_name_chars + last_name_chars])
                 print("Letters of the last name not lowercase!")
                 return False
+            if not len(msg) == first_name_chars + last_name_chars:
+                return False
             return True
     _v.__doc__ = f"""Initials should be {first_name_chars + last_name_chars}-letter
         words with {first_name_chars} letters of your first name
