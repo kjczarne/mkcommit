@@ -1,4 +1,4 @@
-from mkcommit.model import Keyword, Validator, ValidationFailedException
+from mkcommit.model import Keyword, Validator
 from typing import List, Any, Optional
 
 
