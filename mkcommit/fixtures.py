@@ -19,10 +19,13 @@ def _ask(
         "Float Test": "12.0",
         "Regex Test": "match_me",
         "Max Length Test": "this is shorter than 30 chars",
+        "Initials": "KrzCza",
         "Integer Test Invalid": "asdf",
         "Float Test Invalid": "qwer",
         "Regex Test Invalid": "no_match",
-        "Max Length Test Invalid": "this is not shorter than 30 chars"
+        "Max Length Test Invalid": "this is not shorter than 30 chars",
+        "Initials Invalid": "KrzyCzar",
+        "Initials Invalid2": "KrzCzar",
     }
     result = answers[question]
 
