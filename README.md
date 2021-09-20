@@ -20,11 +20,26 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 
 - Run `mkcommit` to generate a Git commit message and print it to standard output.
 - Run `mkcommit -c` to generate a Git commmit message and copy it to your clipboard.
+- Run `git commit -m "$(mkcommit)"` to run `mkcommit` and feed the output to `git commit` directly (doesn't work on Windows).
 
 ## Configuration
 
 1. At the root of your repository create a Python filed named `my_repo.mkcommit.py`.
 2. Compose the script:
+
+    A built-in _semantic commit_ suite can be used:
+
+    ```python
+    from mkcommit import CommitMessage, to_stdout
+    from mkcommit.suites import semantic
+
+    c = CommitMessage(semantic.default_short())
+
+    if __name__ == "__main__":
+        to_stdout(c)
+    ```
+
+    If you need to define your own keywords and commit message template you can use `mkcommit`'s building blocks:
 
     ```python
     from mkcommit import Keyword, CommitMessage, ask, to_stdout

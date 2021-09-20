@@ -1,5 +1,6 @@
 import argparse
 import glob
+import os
 from typing import Callable, Optional, Union
 from InquirerPy import inquirer
 from enum import Enum
@@ -103,6 +104,9 @@ def main():
         _main(args.file, mode)
     else:
         mkcommit_files = glob.glob("*.mkcommit.py")
+        if os.path.exists(".mkcommit.py"):
+            # add also a dotfile if no prefix is used
+            mkcommit_files.append(".mkcommit.py")
         if len(mkcommit_files) == 0:
             raise NoFilesFoundException("No `*.mkcommit.py` files found")
         selected_file = inquirer.select(

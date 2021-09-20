@@ -34,7 +34,7 @@ def _init_buffer_file() -> str:
     return file_path
 
 
-def editor(editor_command: Optional[str]) -> str:
+def editor(editor_command: Optional[str] = None) -> str:
     file_path = _init_buffer_file()
     _handle_editor(editor_command, file_path)
     with open(file_path, "r") as f:

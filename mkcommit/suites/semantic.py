@@ -1,0 +1,46 @@
+from mkcommit.model import Keyword, ask, CommaSeparatedList
+from mkcommit.validators import max_len
+from mkcommit.editor_handler import editor
+
+semantic_commit_keywords = [
+    Keyword("feat", "New Feature"),
+    Keyword("fix", "Bug Fix"),
+    Keyword("chore", "Generic task"),
+    Keyword("wip", "Work in progress"),
+    Keyword("doc", "Documentation updated"),
+    Keyword("refactor", "Refactoring something"),
+    Keyword("test", "Added a test, tested an element"),
+    Keyword("revert", "Revert a previous change"),
+    Keyword("style", "Improved code style")
+]
+
+ask_keywords = lambda: ask(
+    "Select one or more keywords applicable (use TAB): ",
+    one_or_more=semantic_commit_keywords
+)
+
+ask_scope = lambda: ask(
+    "(Optional) provide change scope: "
+)
+
+ask_short_commit_msg = lambda: ask(
+    "Provide the short commit msg, max 55 characters long: ",
+    check=max_len(55)
+)
+
+ask_long_commit_msg = lambda: ask(
+    "Provide the long commit msg: "
+)
+
+def default_short() -> str:
+    keywords = CommaSeparatedList(*[k.keyword for k in ask_keywords()])
+    scope = ask_scope()
+    short_commit = ask_short_commit_msg()
+    if scope:
+        return f"{keywords}({scope}): {short_commit}"
+    else:
+        return f"{keywords}: {short_commit}"
+
+
+def default_long():
+    return editor()
