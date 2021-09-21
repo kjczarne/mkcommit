@@ -5,7 +5,7 @@ from prettyprinter import pprint
 
 import platform
 
-if platform.platform() == "Windows":
+if platform.system() == "Windows":
     from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
 
 
@@ -97,7 +97,7 @@ ValidatorClosure = Callable[..., Validator]
 
 def select(question: str, one_of: List[Any]):
     inquirer_exec = lambda: inquirer.select(question, one_of).execute()
-    if platform.platform() == "Windows":
+    if platform.system() == "Windows":
         try:
             return inquirer_exec()
         except NoConsoleScreenBufferError:
@@ -111,7 +111,7 @@ def select(question: str, one_of: List[Any]):
 
 def checkbox(question: str, one_or_more: List[Any]):
     inquirer_exec = lambda: inquirer.checkbox(question, one_or_more).execute()
-    if platform.platform() == "Windows":
+    if platform.system() == "Windows":
         try:
             return inquirer_exec()
         except NoConsoleScreenBufferError:
@@ -126,7 +126,7 @@ def checkbox(question: str, one_or_more: List[Any]):
 
 def confirm(question: str):
     inquirer_exec = lambda: inquirer.confirm(question).execute()
-    if platform.platform() == "Windows":
+    if platform.system() == "Windows":
         try:
             return inquirer_exec()
         except NoConsoleScreenBufferError:
@@ -144,7 +144,7 @@ def confirm(question: str):
 
 def text(question: str):
     inquirer_exec = lambda: inquirer.text(question).execute()
-    if platform.platform() == "Windows":
+    if platform.system() == "Windows":
         try:
             return inquirer.text(question).execute()
         except NoConsoleScreenBufferError:
