@@ -47,7 +47,6 @@ class TestValidators(unittest.TestCase):
     def test_validators_invalid(self):
         """Each invalid input should properly add `INVALID-` fixture prefix."""
         msg = self.make_invalid().first_line
-        print(msg)
         invalid_bits = re.findall(r'INVALID', msg)
         self.assertEqual(6, len(invalid_bits))
 

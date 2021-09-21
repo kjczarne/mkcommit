@@ -32,14 +32,21 @@ ask_long_commit_msg = lambda: ask(
     "Provide the long commit msg: "
 )
 
+ask_breaking = lambda: ask(
+    "Is this a breaking change?",
+    yes_no=True
+)
+
+
 def default_short() -> str:
     keywords = CommaSeparatedList(*[k.keyword for k in ask_keywords()])
     scope = ask_scope()
     short_commit = ask_short_commit_msg()
+    breaking = "!" if ask_breaking() else ""
     if scope:
-        return f"{keywords}({scope}): {short_commit}"
+        return f"{keywords}({scope}){breaking}: {short_commit}"
     else:
-        return f"{keywords}: {short_commit}"
+        return f"{keywords}{breaking}: {short_commit}"
 
 
 def default_long():
