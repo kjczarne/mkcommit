@@ -4,6 +4,8 @@
 
 Run `mkcommit` instead of `git commit` and you will be asked questions that keep your commits tidy even when it's 3 AM.
 
+![mkcommit gif](static/mkcommit.gif)
+
 ## Why?
 
 ### Why would anybody need this? Aren't editors enough?
