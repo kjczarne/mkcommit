@@ -1,0 +1,5 @@
+-   id: mkcommit
+    name: mkcommit
+    language: python
+    entry: mkcommit
+    'types': [python]
