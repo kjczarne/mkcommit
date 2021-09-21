@@ -1,8 +1,12 @@
 from typing import Any, Callable, List, Optional, Tuple
 from InquirerPy import inquirer
 from dataclasses import dataclass
-from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
 from prettyprinter import pprint
+
+import platform
+
+if platform.platform() == "Windows":
+    from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
 
 
 class QuestionConflictException(Exception):
@@ -92,47 +96,63 @@ ValidatorClosure = Callable[..., Validator]
 
 
 def select(question: str, one_of: List[Any]):
-    try:
-        return inquirer.select(question, one_of).execute()
-    except NoConsoleScreenBufferError:
-        print(question)
-        pprint([str(i) + " - " + str(j) for i, j in enumerate(one_of)])
-        print("\n")
-        return one_of[int(input())]
+    inquirer_exec = lambda: inquirer.select(question, one_of).execute()
+    if platform.platform() == "Windows":
+        try:
+            return inquirer_exec()
+        except NoConsoleScreenBufferError:
+            print(question)
+            pprint([str(i) + " - " + str(j) for i, j in enumerate(one_of)])
+            print("\n")
+            return one_of[int(input())]
+    else:
+        inquirer_exec()
 
 
 def checkbox(question: str, one_or_more: List[Any]):
-    try:
-        return inquirer.checkbox(question, one_or_more).execute()
-    except NoConsoleScreenBufferError:
-        print(question)
-        pprint([str(i) + " - " + str(j) for i, j in enumerate(one_or_more)])
-        print("\n")
-        indices = input().split(",")
-        return [one_or_more[int(i)] for i in indices]
+    inquirer_exec = lambda: inquirer.checkbox(question, one_or_more).execute()
+    if platform.platform() == "Windows":
+        try:
+            return inquirer_exec()
+        except NoConsoleScreenBufferError:
+            print(question)
+            pprint([str(i) + " - " + str(j) for i, j in enumerate(one_or_more)])
+            print("\n")
+            indices = input().split(",")
+            return [one_or_more[int(i)] for i in indices]
+    else:
+        inquirer_exec()
 
 
 def confirm(question: str):
-    try:
-        return inquirer.confirm(question).execute()
-    except NoConsoleScreenBufferError:
-        print(question + " (y/n)")
-        resp = input()
-        if resp.lower() == "y":
-            return True
-        elif resp.lower() == "n":
-            return False
-        else:
-            return confirm(question)
+    inquirer_exec = lambda: inquirer.confirm(question).execute()
+    if platform.platform() == "Windows":
+        try:
+            return inquirer_exec()
+        except NoConsoleScreenBufferError:
+            print(question + " (y/n)")
+            resp = input()
+            if resp.lower() == "y":
+                return True
+            elif resp.lower() == "n":
+                return False
+            else:
+                return confirm(question)
+    else:
+        inquirer_exec()
 
 
 def text(question: str):
-    try:
-        return inquirer.text(question).execute()
-    except NoConsoleScreenBufferError:
-        print(question)
-        print("\n")
-        return input()
+    inquirer_exec = lambda: inquirer.text(question).execute()
+    if platform.platform() == "Windows":
+        try:
+            return inquirer.text(question).execute()
+        except NoConsoleScreenBufferError:
+            print(question)
+            print("\n")
+            return input()
+    else:
+        inquirer_exec()
 
 
 def ask(
