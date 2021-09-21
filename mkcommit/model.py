@@ -106,7 +106,7 @@ def select(question: str, one_of: List[Any]):
             print("\n")
             return one_of[int(input())]
     else:
-        inquirer_exec()
+        return inquirer_exec()
 
 
 def checkbox(question: str, one_or_more: List[Any]):
@@ -121,7 +121,7 @@ def checkbox(question: str, one_or_more: List[Any]):
             indices = input().split(",")
             return [one_or_more[int(i)] for i in indices]
     else:
-        inquirer_exec()
+        return inquirer_exec()
 
 
 def confirm(question: str):
@@ -139,7 +139,7 @@ def confirm(question: str):
             else:
                 return confirm(question)
     else:
-        inquirer_exec()
+        return inquirer_exec()
 
 
 def text(question: str):
@@ -152,7 +152,7 @@ def text(question: str):
             print("\n")
             return input()
     else:
-        inquirer_exec()
+        return inquirer_exec()
 
 
 def ask(
