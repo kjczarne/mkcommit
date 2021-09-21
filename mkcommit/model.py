@@ -1,6 +1,8 @@
 from typing import Any, Callable, List, Optional, Tuple
 from InquirerPy import inquirer
 from dataclasses import dataclass
+from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
+from prettyprinter import pprint
 
 
 class QuestionConflictException(Exception):
@@ -89,6 +91,50 @@ Validator = Callable[[str], bool]
 ValidatorClosure = Callable[..., Validator]
 
 
+def select(question: str, one_of: List[Any]):
+    try:
+        return inquirer.select(question, one_of).execute()
+    except NoConsoleScreenBufferError:
+        print(question)
+        pprint([str(i) + " - " + str(j) for i, j in enumerate(one_of)])
+        print("\n")
+        return one_of[int(input())]
+
+
+def checkbox(question: str, one_or_more: List[Any]):
+    try:
+        return inquirer.checkbox(question, one_or_more).execute()
+    except NoConsoleScreenBufferError:
+        print(question)
+        pprint([str(i) + " - " + str(j) for i, j in enumerate(one_or_more)])
+        print("\n")
+        indices = input().split(",")
+        return [one_or_more[int(i)] for i in indices]
+
+
+def confirm(question: str):
+    try:
+        return inquirer.confirm(question).execute()
+    except NoConsoleScreenBufferError:
+        print(question + " (y/n)")
+        resp = input()
+        if resp.lower() == "y":
+            return True
+        elif resp.lower() == "n":
+            return False
+        else:
+            return confirm(question)
+
+
+def text(question: str):
+    try:
+        return inquirer.text(question).execute()
+    except NoConsoleScreenBufferError:
+        print(question)
+        print("\n")
+        return input()
+
+
 def ask(
     question: Question,
     one_of: Optional[List[Any]] = None,
@@ -107,7 +153,7 @@ def ask(
                 f"when calling `ask`. The args are: `one_of`:{one_of}, "
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
-        result = inquirer.select(question, one_of).execute()
+        result: Any = select(question, one_of)
     if one_or_more:
         stepped_in_flag = True
         if one_of or yes_no:
@@ -116,7 +162,7 @@ def ask(
                 f"when calling `ask`. The args are: `one_of`:{one_of}, "
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
-        result = inquirer.checkbox(question, one_or_more).execute()
+        result: Any = checkbox(question, one_or_more)
     if yes_no:
         stepped_in_flag = True
         if one_of or one_or_more:
@@ -125,9 +171,9 @@ def ask(
                 f"when calling `ask`. The args are: `one_of`:{one_of}, "
                 f"`one_or_more`:{one_or_more}, `yes_no`:{yes_no}"
             )
-        result = inquirer.confirm(question).execute()
+        result: Any = confirm(question)
     if not stepped_in_flag:
-        result = inquirer.text(question).execute()
+        result: Any = text(question)
 
     # WARNING: do not refactor as `if result`, will fail!!!
     if result is not None:
