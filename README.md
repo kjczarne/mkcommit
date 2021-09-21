@@ -2,6 +2,8 @@
 
 `mkcommit` is an extremely simple tool made for commit message generation.
 
+Run `mkcommit` instead of `git commit` and you will be asked questions that keep your commits tidy even when it's 3 AM.
+
 ## Why?
 
 ### Why would anybody need this? Aren't editors enough?
@@ -12,15 +14,21 @@ When working in teams it's hard to enforce proper Git commit message style from 
 
 `commitlint` is a great tool. But it has considerable learning curve if you want to leverage its full potential. This tool strives to be the exact opposite: provide bare minimum with almost no overhead for your teammates. All they will need to learn is this one command: `mkcommit`.
 
+`mkcommit` is:
+
+- Easy to install - all you need is Python (at least version 3.6)
+- Easy to configure - all you need is basic Python skills or advanced copy-pasting skills.
+- Easy to use - all you need is one command to trigger the commit prompt
+
 ## Installation
 
 If you have Python set up, you're good to go. Run `pip install mkcommit` and you're done.
 
 ## Usage
 
-- Run `mkcommit` to generate a Git commit message and print it to standard output.
+- Run `mkcommit` to generate a Git commit message and commit changes (calls `git commit -m` underneath).
+- Run `mkcommit -s` to generate a Git commit message and print it to standard output.
 - Run `mkcommit -c` to generate a Git commmit message and copy it to your clipboard.
-- Run `git commit -m "$(mkcommit)"` to run `mkcommit` and feed the output to `git commit` directly (doesn't work on Windows).
 
 ## Configuration
 
