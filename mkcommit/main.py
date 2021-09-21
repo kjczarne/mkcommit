@@ -10,7 +10,7 @@ import sys
 import pyperclip
 
 from mkcommit.model import (
-    CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException,
+    CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException, NotAGitRepoException,
     WrongModeException, NoFilesFoundException
 )
 
@@ -75,6 +75,51 @@ def _main(
             to_clipboard(commit_message_instance)
         else:
             raise WrongModeException(f"You've used invalid mode: {mode}")
+
+
+def configurator():
+    parser = argparse.ArgumentParser(description="mkcommitconfig")
+    parser.add_argument(
+        "--addhook",
+        action="store_true",
+        help="Install `mkcommit` as a git pre-commit hook in the current repo"
+    )
+    parser.add_argument(
+        "--removehook",
+        action="store_true",
+        help="Remove `mkcommit` from `pre-commit` hooks"
+    )
+    
+    args = parser.parse_args()
+    
+    if args.addhook or args.removehook:
+        if not os.path.exists(".git"):
+            raise NotAGitRepoException(f"{os.getcwd()} is not a git repo!")
+        else:
+            precommit_path = ".git/hooks/pre-commit"
+            if os.path.exists(".git"):
+                if os.path.exists(precommit_path):
+                    with open(precommit_path, "r") as f:
+                        contents = f.read()
+                else:
+                    open(precommit_path, "w").close()
+                    contents = ""
+                if args.addhook:
+                    if "mkcommit" in contents:
+                        print(f"`mkcommit` has already been configured for repo {os.getcwd()}")
+                    else:
+                        with open(precommit_path, "a") as f:
+                            f.write("mkcommit")
+                        print(f"`mkcommit` hook installed for local repo {os.getcwd()}")
+                else:
+                    if "mkcommit" in contents:
+                        with open(precommit_path, "r") as f:
+                            contents = f.read()
+                        with open(precommit_path, "w") as f:
+                            f.write(contents.replace("mkcommit", ""))
+                        print(f"`mkcommit` hook removed for repo {os.getcwd()}")
+                    else:
+                        print(f"`mkcommit` has never been installed for repo {os.getcwd()}")
 
 
 def main():

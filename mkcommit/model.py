@@ -35,6 +35,10 @@ class PlatformUnsupportedException(Exception):
     pass
 
 
+class NotAGitRepoException(Exception):
+    pass
+
+
 @dataclass
 class Text:
     text: str
