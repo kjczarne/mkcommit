@@ -2,7 +2,7 @@ from mkcommit.model import Keyword, ask, CommaSeparatedList
 from mkcommit.validators import max_len
 from mkcommit.editor_handler import editor
 
-semantic_commit_keywords = [
+commit_keywords = [
     Keyword("feat", "New Feature"),
     Keyword("fix", "Bug Fix"),
     Keyword("chore", "Generic task"),
@@ -16,7 +16,7 @@ semantic_commit_keywords = [
 
 ask_keywords = lambda: ask(
     "Select one or more keywords applicable (use TAB): ",
-    one_or_more=semantic_commit_keywords
+    one_or_more=commit_keywords
 )
 
 ask_scope = lambda: ask(
@@ -49,5 +49,5 @@ def default_short() -> str:
         return f"{keywords}{breaking}: {short_commit}"
 
 
-def default_long():
+def default_long() -> str:
     return editor()
