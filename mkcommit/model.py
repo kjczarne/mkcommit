@@ -56,6 +56,13 @@ class Keyword:
     description: str
 
 
+@dataclass
+class Project:
+    name: str
+    ticket_system_id: str
+    description: Optional[str] = ""
+
+
 @dataclass(init=False)
 class CommaSeparatedList:
     
