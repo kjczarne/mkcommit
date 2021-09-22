@@ -175,13 +175,12 @@ def main():
     else:
         mode = Mode.RUN  # Run is default mode
 
-    if args.file:
-        _main(args.file, mode)
-    else:
-        mkcommit_files = glob.glob("*.mkcommit.py")
-        if os.path.exists(".mkcommit.py"):
+    def _find_files_and_run(root: str):
+        with_root = lambda p: os.path.join(root, p)
+        mkcommit_files = glob.glob(with_root("*.mkcommit.py"))
+        if os.path.exists(with_root(".mkcommit.py")):
             # add also a dotfile if no prefix is used
-            mkcommit_files.append(".mkcommit.py")
+            mkcommit_files.append(with_root(".mkcommit.py"))
         if len(mkcommit_files) == 0:
             raise NoFilesFoundException("No `*.mkcommit.py` files found")
         selected_file = select(
@@ -191,6 +190,21 @@ def main():
         else:
             raise TypeError("Result was not a string. This is a bug!")
 
+    if args.file:
+        _main(args.file, mode)
+    else:
+        if os.path.exists(".mkcommit"):
+            try:
+                _find_files_and_run(".mkcommit")
+            except NoFilesFoundException as e:
+                raise NoFilesFoundException(
+                    "No `*.mkcommit.py` files found. `.mkcommit` directory "
+                    "exists in this repository, so only that folder will be "
+                    "looked up. Move `*.mkcommit.py` files there."
+                )
+        else:
+            _find_files_and_run(".")
+        
 
 if __name__ == "__main__":
     main()
