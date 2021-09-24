@@ -6,8 +6,7 @@ project = Project("Some project", "SOMEPROJ")
 
 
 c = CommitMessage(
-    technica.default_short(project, ticket_first=True),
-    ""
+    technica.default_short(project, ticket_first=True)
 )
 
 
