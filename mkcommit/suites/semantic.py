@@ -11,7 +11,8 @@ commit_keywords = [
     Keyword("refactor", "Refactoring something"),
     Keyword("test", "Added a test, tested an element"),
     Keyword("revert", "Revert a previous change"),
-    Keyword("style", "Improved code style")
+    Keyword("style", "Improved code style"),
+    Keyword("clean", "Cleaned up unnecessary stuff")
 ]
 
 ask_keywords = lambda: ask(
