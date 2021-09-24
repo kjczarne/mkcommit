@@ -1,3 +1,5 @@
+from __future__ import annotations
+import subprocess
 from typing import Any, Callable, List, Optional, Tuple
 from InquirerPy import inquirer
 from dataclasses import dataclass
@@ -43,6 +45,15 @@ class PlatformUnsupportedException(Exception):
 
 class NotAGitRepoException(Exception):
     pass
+
+
+def _git_command(*args):
+    return subprocess.run(
+        " ".join(args),
+        check=True,
+        shell=True,
+        capture_output=True
+    ).stdout.decode("utf-8").strip()
 
 
 @dataclass
@@ -95,6 +106,18 @@ class CommitMessage:
             return self.first_line + sep + self.body
         else:
             return self.first_line
+
+
+@dataclass
+class Author:
+    name: str
+    email: str
+
+    @classmethod
+    def from_git(cls) -> Author:
+        name = _git_command("git", "config", "--get", "user.name")
+        email = _git_command("git", "config", "--get", "user.email")
+        return cls(name, email)
 
 
 Question = str
