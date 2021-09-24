@@ -47,7 +47,7 @@ class NotAGitRepoException(Exception):
     pass
 
 
-def _git_command(*args):
+def git_command(*args):
     return subprocess.run(
         " ".join(args),
         check=True,
@@ -115,8 +115,8 @@ class Author:
 
     @classmethod
     def from_git(cls) -> Author:
-        name = _git_command("git", "config", "--get", "user.name")
-        email = _git_command("git", "config", "--get", "user.email")
+        name = git_command("git", "config", "--get", "user.name")
+        email = git_command("git", "config", "--get", "user.email")
         return cls(name, email)
 
 

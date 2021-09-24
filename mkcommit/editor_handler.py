@@ -2,13 +2,13 @@ import os
 from platform import platform
 from typing import Optional
 from mkcommit.model import PlatformUnsupportedException, NotAGitRepoException
-from mkcommit.model import _git_command
+from mkcommit.model import git_command
 import subprocess
 
 
 def _handle_editor(editor_command: Optional[str], file_path: str) -> None:
     if editor_command is None:
-        editor_from_git = _git_command("git", "config", "--get", "core.editor")
+        editor_from_git = git_command("git", "config", "--get", "core.editor")
         if editor_from_git:
             command = f"{editor_from_git} {file_path}"
         else:
