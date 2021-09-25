@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from re import T
 import sys
 from typing import Callable, TypeVar, Union
-from mkcommit.model import InvalidStateException, Paradigm, ValidationFailedException, Validator, Rule
+from mkcommit.model import InvalidStateException, ValidationFailedException, Validator, Rule
 from mkcommit import CommitMessage, to_stdout, ask
 from mkcommit.suites import semantic
 from mkcommit.validators import matches, validate_initials
