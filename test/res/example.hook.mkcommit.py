@@ -1,5 +1,4 @@
-from mkcommit.model import ValidationFailedException
-from mkcommit import CommitMessage, to_stdout, ask
+from mkcommit import CommitMessage, to_stdout, ask, ValidationFailedException
 from mkcommit.validators import validate_initials, matches
 
 
