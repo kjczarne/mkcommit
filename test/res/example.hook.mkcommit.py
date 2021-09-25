@@ -1,36 +1,28 @@
-from dataclasses import dataclass
-from mkcommit.model import ValidationFailedException, Rule
+from mkcommit.model import ValidationFailedException
 from mkcommit import CommitMessage, to_stdout, ask
-from mkcommit.blocks import Text, Initials
+from mkcommit.validators import validate_initials, matches
 
 
-def two_letter_initials(s: str) -> Initials:
-    return Initials(s, 2, 2)
+def initials_are_two_letter(s: str) -> bool:
+    return validate_initials(2, 2)(s)
 
-def text_matches(s: str) -> Text:
-    return Text(s)
 
-@dataclass
-class Rules:
-    initials: Rule[Initials] = two_letter_initials
-    something: Rule[Text] = text_matches
+def something_matches_blah(s: str) -> bool:
+    return matches(r"blah")(s)
 
 
 def commit() -> CommitMessage:
-    initials = ask("Your initials: ")
-    Rules.initials(initials).check()
-    something = ask("Your something: ")
-    Rules.something(something).check(r"blah")
+    initials = ask("Your initials: ", check=initials_are_two_letter)
+    something = ask("Your something: ", check=something_matches_blah)
     return CommitMessage(
         f"{initials} | {something}"
     )
 
 
 def pre_commit(commit_message: CommitMessage):
-    rules = Rules()
     initials, something = commit_message.first_line.split(" | ")
-    initials_comply = rules.initials(initials).check()
-    something_complies = rules.something(something).check(r"blah")
+    initials_comply = initials_are_two_letter(initials)
+    something_complies = something_matches_blah(something)
 
     if not initials_comply:
         raise ValidationFailedException("initials")
