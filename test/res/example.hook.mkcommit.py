@@ -1,18 +1,19 @@
 from dataclasses import dataclass
-from re import T
-import sys
-from typing import Callable, TypeVar, Union
-from mkcommit.model import InvalidStateException, ValidationFailedException, Validator, Rule
+from mkcommit.model import ValidationFailedException, Rule
 from mkcommit import CommitMessage, to_stdout, ask
-from mkcommit.suites import semantic
-from mkcommit.validators import matches, validate_initials
 from mkcommit.blocks import Text, Initials
 
 
+def two_letter_initials(s: str) -> Initials:
+    return Initials(s, 2, 2)
+
+def text_matches(s: str) -> Text:
+    return Text(s)
+
 @dataclass
 class Rules:
-    initials: Rule[Initials] = lambda x: Initials(x, 2, 2)
-    something: Rule[Text] = lambda x: Text(x)
+    initials: Rule[Initials] = two_letter_initials
+    something: Rule[Text] = text_matches
 
 
 def commit() -> CommitMessage:
