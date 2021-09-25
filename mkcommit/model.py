@@ -1,6 +1,8 @@
 from __future__ import annotations
+from enum import Enum, auto
 import subprocess
-from typing import Any, Callable, List, Optional, Tuple
+import sys
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
 from InquirerPy import inquirer
 from dataclasses import dataclass
 from prettyprinter import pprint
@@ -47,6 +49,11 @@ class NotAGitRepoException(Exception):
     pass
 
 
+COMMIT_FUNC_NAME = "commit"
+PRE_COMMIT_FUNC_NAME = "pre_commit"
+MODULE_SHIM = "mkcommit.loaded_config"
+
+
 def git_command(*args):
     return subprocess.run(
         " ".join(args),
@@ -54,24 +61,6 @@ def git_command(*args):
         shell=True,
         capture_output=True
     ).stdout.decode("utf-8").strip()
-
-
-@dataclass
-class Text:
-    text: str
-
-
-@dataclass
-class Keyword:
-    keyword: str
-    description: str
-
-
-@dataclass
-class Project:
-    name: str
-    ticket_system_id: str
-    description: Optional[str] = ""
 
 
 @dataclass(init=False)
@@ -100,6 +89,7 @@ Body = str
 class CommitMessage:
     first_line: FirstLine
     body: Body = ""
+    validate: Callable[[CommitMessage], bool] = lambda self: True
 
     def make(self, sep: str = "\n\n") -> str:
         if self.body:
@@ -123,6 +113,8 @@ class Author:
 Question = str
 Validator = Callable[[str], bool]
 ValidatorClosure = Callable[..., Validator]
+T = TypeVar("T")
+Rule = Callable[[str], T]
 
 
 def select(question: str, one_of: List[Any]):

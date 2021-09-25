@@ -3,7 +3,7 @@ import unittest
 import pyperclip
 
 from mkcommit.main import _main, Mode
-from mkcommit.model import CommaSeparatedList
+from mkcommit.model import CommaSeparatedList, ValidationFailedException
 
 
 class TestBasic(unittest.TestCase):
@@ -16,6 +16,12 @@ class TestBasic(unittest.TestCase):
             'res',
             'example.test.mkcommit.py'
         )
+        cls.path_hook = os.path.join(
+            os.path.dirname(__file__),
+            '..',
+            'res',
+            'example.hook.mkcommit.py'
+        )
 
     def test_basic_file_config_stdout(self):
         """Test whether STDOUT write works properly"""
@@ -25,6 +31,7 @@ class TestBasic(unittest.TestCase):
         _main(
             self.path,
             Mode.STDOUT,
+            None,
             lambda msg: stdout_writes.append(msg),
             lambda msg: clipboard_writes.append(msg)
         )
@@ -50,6 +57,24 @@ class TestBasic(unittest.TestCase):
         """Tests no-space comma separated list"""
         no_spaces = CommaSeparatedList("eins", "zwei", "drei", no_space=True)
         self.assertEqual(str(no_spaces), "eins,zwei,drei")
+    
+    def test_hook_valid(self):
+        try:
+            _main(
+                self.path_hook,
+                Mode.HOOK,
+                "KrCz | blah"
+            )
+        except ValidationFailedException:
+            self.fail()
+    
+    def test_hook_invalid(self):
+        with self.assertRaises(ValidationFailedException):
+            _main(
+                self.path_hook,
+                Mode.HOOK,
+                "KrCz | asdf"
+            )
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
-from mkcommit.model import Keyword, ask, CommaSeparatedList
+from mkcommit.model import ask, CommaSeparatedList
+from mkcommit.blocks import Keyword
 from mkcommit.validators import max_len
 from mkcommit.editor_handler import editor
 

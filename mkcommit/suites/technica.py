@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List
-from mkcommit.model import CommaSeparatedList, ask, Project
+from mkcommit.model import CommaSeparatedList, ask
+from mkcommit.blocks import Project
 from mkcommit.model import Author as BaseAuthor
 from mkcommit.validators import is_int, validate_initials
 from mkcommit.suites.semantic import (
