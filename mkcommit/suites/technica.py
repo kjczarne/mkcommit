@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import List
-from mkcommit.model import CommaSeparatedList, ask
+from mkcommit.model import CommaSeparatedList, ValidationFailedException, ask
 from mkcommit.blocks import Project
 from mkcommit.model import Author as BaseAuthor
-from mkcommit.validators import is_int, validate_initials
+from mkcommit.validators import is_int, matches, validate_initials
 from mkcommit.suites import semantic
 from enum import Enum, auto
 
@@ -24,6 +24,61 @@ class Author(BaseAuthor):
     def from_git(cls) -> Author:
         author = super().from_git()
         return cls(author.name, author.email)
+
+
+def initials_are_2_chars_each(s: str) -> bool:
+    """Validates if first name and last name initials have both 2 letters, e.g. 'AbCd'."""
+    return validate_initials(2, 2)(s)
+
+
+def ticket_id_correctly_formatted(s: str) -> bool:
+    """Checks if Ticket ID is in the form of 'PROJECTNAME-1234'"""
+    return matches(r"^\w+-\d+$")(s)
+
+
+def is_technica(s: str, ticket_first: bool = False) -> bool:
+    two_parts = s.split("]")
+    if len(two_parts) < 2:
+        raise ValidationFailedException(
+            f"{s} could not be split on ']' character. "
+            "The commit message seems malformed!"
+        )
+    else:
+        preamble = two_parts[0]
+        semantic_part = two_parts[1]
+        
+        # split the preamble:
+        preamble_split = preamble.split("/")
+        if len(preamble_split) < 2:
+            raise ValidationFailedException(
+                "The preamble {preamble}] could not be split on '/' character. "
+                "The commit message seems malformed!"
+            )
+        else:
+            # validate the preamble:
+            if ticket_first:
+                ticket = preamble_split[0].replace("[", "")
+                initials = preamble_split[1]
+            else:
+                initials = preamble_split[0].replace("[", "")
+                ticket = preamble_split[1]
+
+        # validate the semantic part:
+        if not semantic.is_semantic(semantic_part):
+            raise ValidationFailedException(
+                "The semantic part of the message, i.e. <keyword>: <message> is "
+                f"not compliant with the semantic commit specification. Input was: {semantic_part}"
+            )
+        else:
+            if not initials_are_2_chars_each(initials):
+                raise ValidationFailedException(
+                    f"Initials should look like AbCd but were {initials}"
+                )
+            if not ticket_id_correctly_formatted(ticket):
+                raise ValidationFailedException(
+                    f"Ticket ID should look like PROJECTNAME-1234 but was {ticket}"
+                )
+            return True
 
 
 ask_initials = lambda: ask(
