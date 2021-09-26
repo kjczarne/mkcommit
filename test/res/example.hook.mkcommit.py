@@ -24,7 +24,7 @@ def commit() -> CommitMessage:
     )
 
 
-def pre_commit(commit_message: CommitMessage):
+def on_commit(commit_message: CommitMessage):
     initials, something = commit_message.first_line.split(" | ")
     initials_are_two_letter(initials)
     something_matches_blah(something)

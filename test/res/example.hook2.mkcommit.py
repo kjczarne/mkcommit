@@ -26,7 +26,7 @@ def commit() -> CommitMessage:
     )
 
 
-def pre_commit(commit_message: CommitMessage):
+def on_commit(commit_message: CommitMessage):
     rules = Rules()
     initials, something = commit_message.first_line.split(" | ")
     initials_comply = rules.initials(initials).check()

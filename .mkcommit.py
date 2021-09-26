@@ -11,7 +11,7 @@ def commit():
     return CommitMessage(semantic.default_short())
 
 
-def pre_commit(msg: CommitMessage):
+def on_commit(msg: CommitMessage):
     semantic.is_semantic(msg.first_line)
     semantic.has_short_commit_msg_proper_length(msg.first_line)
 

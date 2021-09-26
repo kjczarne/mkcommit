@@ -50,7 +50,7 @@ class NotAGitRepoException(Exception):
 
 
 COMMIT_FUNC_NAME = "commit"
-PRE_COMMIT_FUNC_NAME = "pre_commit"
+PRE_COMMIT_FUNC_NAME = "on_commit"
 MODULE_SHIM = "mkcommit.loaded_config"
 
 

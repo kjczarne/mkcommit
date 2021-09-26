@@ -58,7 +58,7 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 - Run `mkcommit` to generate a Git commit message and commit changes (calls `git commit -m` underneath).
 - Run `mkcommit -s` to generate a Git commit message and print it to standard output.
 - Run `mkcommit -c` to generate a Git commmit message and copy it to your clipboard.
-- Use `mkcommit -x "some commit message"` to validate an existing commit message from the command line or as a Git Hook command (requires `pre_commit(msg)` function to be implemented in the configuration file).
+- Use `mkcommit -x "some commit message"` to validate an existing commit message from the command line or as a Git Hook command (requires `on_commit(msg)` function to be implemented in the configuration file).
 
 If you wish to point `mkcommit` to a specific configuration file, use `mkcommit -f /path/to/.mkcommit.py`. You can combine the `-f` flag with all the other available flags.
 
