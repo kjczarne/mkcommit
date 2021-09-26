@@ -22,7 +22,7 @@ class Fixture(unittest.TestCase):
 
 
 class TestSemantic(Fixture):
-    
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.semantic_valid = [
@@ -56,7 +56,7 @@ class TestSemantic(Fixture):
 
 
 class TestTechnica(Fixture):
-    
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.technica_valid = [
@@ -79,7 +79,7 @@ class TestTechnica(Fixture):
             "[KrCz/--] feat: lol",
             "[KrCz/] feat: lol",
         ]
-    
+
     def test_technica(self):
         self.eval_list(
             self.technica_valid,

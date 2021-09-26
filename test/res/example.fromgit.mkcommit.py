@@ -1,6 +1,7 @@
 from mkcommit import CommitMessage, to_stdout, Author
 from mkcommit.suites import semantic
 
+
 def commit():
     author = Author.from_git()
 

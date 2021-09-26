@@ -9,6 +9,7 @@ def commit():
         technica.default_short(project, ticket_first=True)
     )
 
+
 def on_commit(msg: CommitMessage):
     technica.is_technica(msg.first_line)
 

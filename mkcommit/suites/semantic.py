@@ -25,7 +25,7 @@ def is_shorter_than_55_chars(s: str) -> bool:
 def is_keyword(s: str) -> bool:
     """True if the input is a valid Semantic Commit keyword."""
     str_keywords = [k.keyword for k in commit_keywords]
-    if not s in str_keywords:
+    if s not in str_keywords:
         raise ValidationFailedException(
             f"{s} is not a valid keyword. Should be one of: {str_keywords}"
         )

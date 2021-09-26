@@ -47,7 +47,7 @@ class TestBasic(unittest.TestCase):
         )
         msg = pyperclip.paste()
         self.assertEqual("[MYPROJECT-1234/KrCz] feat: cool", msg)
-    
+
     def test_comma_separated_list_with_spaces(self):
         """Tests yes-space comma separated list"""
         with_spaces = CommaSeparatedList("eins", "zwei", "drei")
@@ -57,7 +57,7 @@ class TestBasic(unittest.TestCase):
         """Tests no-space comma separated list"""
         no_spaces = CommaSeparatedList("eins", "zwei", "drei", no_space=True)
         self.assertEqual(str(no_spaces), "eins,zwei,drei")
-    
+
     def test_hook_valid(self):
         try:
             _main(
@@ -67,7 +67,7 @@ class TestBasic(unittest.TestCase):
             )
         except ValidationFailedException:
             self.fail()
-    
+
     def test_hook_invalid(self):
         with self.assertRaises(ValidationFailedException):
             _main(

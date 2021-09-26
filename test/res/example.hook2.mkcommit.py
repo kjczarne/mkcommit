@@ -7,8 +7,10 @@ from mkcommit.blocks import Text, Initials
 def two_letter_initials(s: str) -> Initials:
     return Initials(s, 2, 2)
 
+
 def text_matches(s: str) -> Text:
     return Text(s)
+
 
 @dataclass
 class Rules:

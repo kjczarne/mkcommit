@@ -16,8 +16,8 @@ class Order(Enum):
 class Author(BaseAuthor):
     def make_initials(self, first_name_chars: int, last_name_chars: int) -> str:
         """Opinionated initials producer compliant with `validate_initials(2,2)`"""
-        l = self.name.split(" ")
-        fname, lname = l[0], l[-1]
+        l_split = self.name.split(" ")
+        fname, lname = l_split[0], l_split[-1]
         return fname[0:first_name_chars] + lname[0:last_name_chars]
 
     @classmethod
@@ -46,7 +46,7 @@ def is_technica(s: str, ticket_first: bool = False) -> bool:
     else:
         preamble = two_parts[0].strip()
         semantic_part = two_parts[1].strip()
-        
+
         # split the preamble:
         preamble_split = preamble.split("/")
         if len(preamble_split) < 2:
@@ -115,12 +115,13 @@ def default_short(
     keywords = CommaSeparatedList(*[k.keyword for k in semantic.ask_keywords()])
     short_commit = ask_short_commit_msg()
     breaking = "!" if ask_breaking() else ""
-    
+
     if ticket_first:
         return f"[{ticket}/{initials}] " + \
             f"{keywords}{breaking}: {short_commit}"
     else:
         return f"[{initials}/{ticket}] " + \
             f"{keywords}{breaking}: {short_commit}"
+
 
 default_long = semantic.default_long

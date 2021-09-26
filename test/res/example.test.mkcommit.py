@@ -12,6 +12,7 @@ keywords = [
     ),
 ]
 
+
 def commit():
     ticket_preamble = "MYPROJECT"
     keyword = _ask("Keyword", one_of=keywords)
@@ -24,6 +25,7 @@ def commit():
         f"[{ticket_preamble}-{ticket_number}/{initials}] {keyword.keyword}: {first_line}",
         extended_message
     )
+
 
 if __name__ == "__main__":
     to_stdout(commit())

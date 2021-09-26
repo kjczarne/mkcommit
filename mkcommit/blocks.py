@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from typing import Optional
 from mkcommit.validators import matches, validate_initials
 
+
 @dataclass
 class Text:
     text: str
-    
+
     def check(self, pattern) -> bool:
         return matches(pattern)(self.text)
 
@@ -28,7 +29,7 @@ class Initials:
     initials: str
     first_chars: int
     last_chars: int
-    
+
     def check(self) -> bool:
         return validate_initials(
             self.first_chars,
