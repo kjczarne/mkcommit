@@ -9,6 +9,9 @@ def commit():
         technica.default_short(project, ticket_first=True)
     )
 
+def pre_commit(msg: CommitMessage):
+    technica.is_technica(msg.first_line)
+
 
 if __name__ == "__main__":
     to_stdout(commit())
