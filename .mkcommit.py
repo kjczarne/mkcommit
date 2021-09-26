@@ -12,7 +12,8 @@ def commit():
 
 
 def pre_commit(msg: CommitMessage):
-    pass  # TODO: semantic doesn't declare a validator yet
+    semantic.is_semantic(msg.first_line)
+    semantic.has_short_commit_msg_proper_length(msg.first_line)
 
 
 if __name__ == "__main__":
