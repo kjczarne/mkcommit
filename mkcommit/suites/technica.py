@@ -44,8 +44,8 @@ def is_technica(s: str, ticket_first: bool = False) -> bool:
             "The commit message seems malformed!"
         )
     else:
-        preamble = two_parts[0]
-        semantic_part = two_parts[1]
+        preamble = two_parts[0].strip()
+        semantic_part = two_parts[1].strip()
         
         # split the preamble:
         preamble_split = preamble.split("/")
