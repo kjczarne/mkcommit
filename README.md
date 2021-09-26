@@ -20,9 +20,10 @@ When working in teams it's hard to enforce proper Git commit message style from 
 
 `mkcommit` is:
 
-- Easy to install - all you need is Python (at least version 3.6)
+- Easy to install - all you need is Python (at least version 3.6).
 - Easy to configure - all you need is basic Python skills or advanced copy-pasting skills.
-- Easy to use - all you need is one command to trigger the commit prompt
+- Easy to use - all you need is one command to trigger the commit prompt.
+- Scalable - it can be as complex as you want it, with full Git Hook integration and complex validation rules or just with a plain default Semantic Commit generation out-of-the-box.
 
 ## Installation
 
@@ -33,6 +34,7 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 - Run `mkcommit` to generate a Git commit message and commit changes (calls `git commit -m` underneath).
 - Run `mkcommit -s` to generate a Git commit message and print it to standard output.
 - Run `mkcommit -c` to generate a Git commmit message and copy it to your clipboard.
+- Use `mkcommit -x "some commit message"` to validate an existing commit message from the command line or as a Git Hook command (requires `pre_commit(msg)` function to be implemented in the configuration file).
 
 ## Configuration
 
@@ -53,6 +55,8 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
     ```
 
     If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
+
+    If you want to learn how to use the hook mode, read [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks) in our Wiki.
 3. Run `mkcommit`. You can either:
     - Run it as `mkcommit -f /path/to/some.mkcommit.py`
     - Or trigger it in the current working directory. `mkcommit` will search for all `*.mkcommit.py` files and will let you select the one applicable from the list (this way you can have many config files for many diverse scenarios if you so forsee).
