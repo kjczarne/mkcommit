@@ -168,6 +168,9 @@ def main():
                         "This is intended to be used mainly as an entrypoint for `pre-commit` "
                         "hooks"
                         )
+    parser.add_argument('-a', '--autoselect',
+                        action="store_true", help="Automatically selects "
+                        "the first found `*.mkcommit.py` file")
 
     args = parser.parse_args()
 
@@ -193,8 +196,12 @@ def main():
             mkcommit_files.append(with_root(".mkcommit.py"))
         if len(mkcommit_files) == 0:
             raise NoFilesFoundException("No `*.mkcommit.py` files found")
-        selected_file = select(
-            "Select one of the following files I've found", mkcommit_files)
+        if args.autoselect:
+            print(os.getcwd())
+            selected_file = mkcommit_files[0]
+        else:
+            selected_file = select(
+                "Select one of the following files I've found", mkcommit_files)
         if type(selected_file) is str:
             _main(selected_file, mode, args.hook)
         else:
