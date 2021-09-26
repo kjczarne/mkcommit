@@ -120,7 +120,13 @@ def _main(
         if commit_msg_str_from_hook is None:
             raise ValueError("Commit message was empty!")
         else:
-            commit_message_instance = CommitMessage(commit_msg_str_from_hook)
+            lines = commit_msg_str_from_hook.splitlines()
+            first_line = lines[0]
+            if len(lines) > 1:
+                body: str = "\n".join(lines[1:])
+            else:
+                body: str = ""
+            commit_message_instance = CommitMessage(first_line, body)
             to_hook(commit_message_instance)
     elif mode == mode.STDOUT:
         commit_message_instance = _get_commit_msg_from_module()
