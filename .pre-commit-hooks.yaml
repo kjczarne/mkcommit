@@ -1,8 +1,0 @@
-- id: mkcommit
-  name: mkcommit
-  entry: mkcommit
-  language: python
-  'types': [python]
-  args: ['-x', '"$(cat $1)"']
-  additional_dependencies: []
-  stages: [commit-msg]
