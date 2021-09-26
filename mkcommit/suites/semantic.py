@@ -35,8 +35,11 @@ def is_keyword(s: str) -> bool:
 
 def is_semantic(s: str) -> bool:
     """True if the message corresponds to a Semantic Commit message."""
-    kwds = "|".join([k.keyword for k in commit_keywords])
-    if not matches(kwds + r"(\(.+\))?: .+")(s):
+    kwds = "(" + "|".join([k.keyword for k in commit_keywords]) + ")"
+    kwds_with_commas = "(" + "|".join([k.keyword + r", ?" for k in commit_keywords]) + ")"
+    # like: r"(feat|fix)(\(.+\))?: .+|(feat, ?|fix, ?)(feat|fix)(\(.+\))?: .+"
+    description = r"((\(.+\))?: .+)"
+    if not matches(kwds + description + "|" + kwds_with_commas + kwds + description)(s):
         raise ValidationFailedException(
             "The message does not comply with a semantic commit formatting rules. "
             f"Was {s}, but should look like e.g. 'feat: something implemented'"
