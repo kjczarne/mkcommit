@@ -4,10 +4,7 @@ from mkcommit.model import CommaSeparatedList, ask
 from mkcommit.blocks import Project
 from mkcommit.model import Author as BaseAuthor
 from mkcommit.validators import is_int, validate_initials
-from mkcommit.suites.semantic import (
-    ask_keywords, ask_breaking, ask_short_commit_msg, ask_long_commit_msg,
-    default_long
-)
+from mkcommit.suites import semantic
 from enum import Enum, auto
 
 
@@ -35,6 +32,9 @@ ask_initials = lambda: ask(
 )
 ask_ticket = lambda: ask("Ticket number: ", check=is_int())
 ask_order = lambda: ask("Select order: ", list(Order))
+ask_short_commit_msg = semantic.ask_short_commit_msg
+ask_long_commit_msg = semantic.ask_long_commit_msg
+ask_breaking = semantic.ask_breaking
 
 
 def ask_project(projects: List[Project]) -> str:
@@ -51,7 +51,7 @@ def default_short(
     else:
         initials = ask_initials()
     ticket = ask_ticket()
-    keywords = CommaSeparatedList(*[k.keyword for k in ask_keywords()])
+    keywords = CommaSeparatedList(*[k.keyword for k in semantic.ask_keywords()])
     short_commit = ask_short_commit_msg()
     breaking = "!" if ask_breaking() else ""
     
@@ -61,3 +61,5 @@ def default_short(
     else:
         return f"[{initials}/{project.ticket_system_id}-{ticket}] " + \
             f"{keywords}{breaking}: {short_commit}"
+
+default_long = semantic.default_long
