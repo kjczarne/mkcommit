@@ -241,7 +241,7 @@ def main():
         selected_file = select(
             "Select one of the following files I've found", mkcommit_files)
         if type(selected_file) is str:
-            _main(selected_file, mode)
+            _main(selected_file, mode, args.hook)
         else:
             raise TypeError("Result was not a string. This is a bug!")
 
