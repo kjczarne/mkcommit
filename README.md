@@ -45,10 +45,11 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
     from mkcommit import CommitMessage, to_stdout
     from mkcommit.suites import semantic
 
-    c = CommitMessage(semantic.default_short())
+    def commit():
+        return CommitMessage(semantic.default_short())
 
     if __name__ == "__main__":
-        to_stdout(c)
+        to_stdout(commit())
     ```
 
     If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
