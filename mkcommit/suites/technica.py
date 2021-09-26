@@ -33,7 +33,7 @@ def initials_are_2_chars_each(s: str) -> bool:
 
 def ticket_id_correctly_formatted(s: str) -> bool:
     """Checks if Ticket ID is in the form of 'PROJECTNAME-1234'"""
-    return matches(r"^\w+-\d+$")(s)
+    return matches(r"^\w+-\d+$|^---$|^-$")(s)
 
 
 def is_technica(s: str, ticket_first: bool = False) -> bool:
@@ -85,6 +85,7 @@ ask_initials = lambda: ask(
     "Your initials (2 letters of your first name + 2 letters of your last name): ",
     check=validate_initials(2, 2)
 )
+ask_include_ticket = lambda: ask("Is the change linked to an existing ticket?", yes_no=True)
 ask_ticket = lambda: ask("Ticket number: ", check=is_int())
 ask_order = lambda: ask("Select order: ", list(Order))
 ask_short_commit_msg = semantic.ask_short_commit_msg
@@ -105,16 +106,21 @@ def default_short(
         initials = Author.from_git().make_initials(2, 2)
     else:
         initials = ask_initials()
-    ticket = ask_ticket()
+    is_related_to_ticket = ask_include_ticket()
+    if is_related_to_ticket:
+        ticket_number = ask_ticket()
+        ticket = f"{project.ticket_system_id}-{ticket_number}"
+    else:
+        ticket = "-"
     keywords = CommaSeparatedList(*[k.keyword for k in semantic.ask_keywords()])
     short_commit = ask_short_commit_msg()
     breaking = "!" if ask_breaking() else ""
     
     if ticket_first:
-        return f"[{project.ticket_system_id}-{ticket}/{initials}] " + \
+        return f"[{ticket}/{initials}] " + \
             f"{keywords}{breaking}: {short_commit}"
     else:
-        return f"[{initials}/{project.ticket_system_id}-{ticket}] " + \
+        return f"[{initials}/{ticket}] " + \
             f"{keywords}{breaking}: {short_commit}"
 
 default_long = semantic.default_long
