@@ -1,0 +1,6 @@
+repos:
+  - repo: https://github.com/kjczarne/mkcommit.git
+    rev: v1.0.0
+    hooks:
+      - id: mkcommit
+        args: [-f=".mkcommit.py"]
