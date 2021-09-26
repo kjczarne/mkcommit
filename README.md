@@ -24,6 +24,7 @@ When working in teams it's hard to enforce proper Git commit message style from 
 - Easy to configure - all you need is basic Python skills or advanced copy-pasting skills.
 - Easy to use - all you need is one command to trigger the commit prompt.
 - Scalable - it can be as complex as you want it, with full Git Hook integration and complex validation rules or just with a plain default Semantic Commit generation out-of-the-box.
+- Pythonic - might suit you better if you're familiar with Python and don't want to venture into the world of JavaScript.
 
 ## Installation
 
