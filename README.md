@@ -30,16 +30,9 @@ When working in teams it's hard to enforce proper Git commit message style from 
 
 If you have Python set up, you're good to go. Run `pip install mkcommit` and you're done.
 
-## Usage
-
-- Run `mkcommit` to generate a Git commit message and commit changes (calls `git commit -m` underneath).
-- Run `mkcommit -s` to generate a Git commit message and print it to standard output.
-- Run `mkcommit -c` to generate a Git commmit message and copy it to your clipboard.
-- Use `mkcommit -x "some commit message"` to validate an existing commit message from the command line or as a Git Hook command (requires `pre_commit(msg)` function to be implemented in the configuration file).
-
 ## Configuration
 
-1. At the root of your repository create a Python filed named `my_repo.mkcommit.py`.
+1. At the root of your repository create a Python file named `my_repo.mkcommit.py`.
 2. Compose the script:
 
     A built-in _semantic commit_ suite can be used:
@@ -58,27 +51,19 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
     If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
 
     If you want to learn how to use the hook mode, read [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks) in our Wiki.
-3. Run `mkcommit`. You can either:
-    - Run it as `mkcommit -f /path/to/some.mkcommit.py`
-    - Or trigger it in the current working directory. `mkcommit` will search for all `*.mkcommit.py` files and will let you select the one applicable from the list (this way you can have many config files for many diverse scenarios if you so forsee).
+3. Run `mkcommit`. Select the discovered configuration file for the list and follow the interactive prompt.
+
+## Usage
+
+- Run `mkcommit` to generate a Git commit message and commit changes (calls `git commit -m` underneath).
+- Run `mkcommit -s` to generate a Git commit message and print it to standard output.
+- Run `mkcommit -c` to generate a Git commmit message and copy it to your clipboard.
+- Use `mkcommit -x "some commit message"` to validate an existing commit message from the command line or as a Git Hook command (requires `pre_commit(msg)` function to be implemented in the configuration file).
+
+If you wish to point `mkcommit` to a specific configuration file, use `mkcommit -f /path/to/.mkcommit.py`. You can combine the `-f` flag with all the other available flags.
 
 ### Input validation
 
-Some of the validators we're offering at the moment:
+The most basic validation strategy we use is [validation at the time of message generation](https://github.com/kjczarne/mkcommit/wiki/Validators).
 
-- `mkcommit.validators.is_int` - validates input as integers
-- `mkcommit.validators.is_float` - validates input as floating-point numbers
-- `mkcommit.validators.max_len` - raises a validation error if maximum length is exceeded
-- `mkcommit.validators.matches` - matches an arbitrary regex pattern
-
-Example of usage:
-
-```python
-from mkcommit import Keyword, CommitMessage, ask
-from mkcommit.validators import is_int, matches
-
-ticket_number = ask("Ticket number", is_int())    # integer ticket number
-initials = ask("Initials", matches(r'\w\w\w\w'))  # 4-letter initials
-```
-
-You can learn more about validators in our [Wiki](https://github.com/kjczarne/mkcommit.wiki.git)
+For validation of commit messages that aren't originally generated with `mkcommit` you can use [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks).
