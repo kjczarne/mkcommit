@@ -3,11 +3,17 @@ from mkcommit.validators import validate_initials, matches
 
 
 def initials_are_two_letter(s: str) -> bool:
-    return validate_initials(2, 2)(s)
+    if not validate_initials(2, 2)(s):
+        raise ValidationFailedException("initials")
+    else:
+        return True
 
 
 def something_matches_blah(s: str) -> bool:
-    return matches(r"blah")(s)
+    if not matches(r"blah")(s):
+        raise ValidationFailedException("something")
+    else:
+        return True
 
 
 def commit() -> CommitMessage:
@@ -20,13 +26,8 @@ def commit() -> CommitMessage:
 
 def pre_commit(commit_message: CommitMessage):
     initials, something = commit_message.first_line.split(" | ")
-    initials_comply = initials_are_two_letter(initials)
-    something_complies = something_matches_blah(something)
-
-    if not initials_comply:
-        raise ValidationFailedException("initials")
-    if not something_complies:
-        raise ValidationFailedException("something")
+    initials_are_two_letter(initials)
+    something_matches_blah(something)
 
 
 if __name__ == "__main__":

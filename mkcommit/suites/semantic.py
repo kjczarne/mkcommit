@@ -1,4 +1,4 @@
-from mkcommit.model import ask, CommaSeparatedList
+from mkcommit.model import ValidationFailedException, ask, CommaSeparatedList
 from mkcommit.blocks import Keyword
 from mkcommit.validators import matches, max_len
 from mkcommit.editor_handler import editor
@@ -24,20 +24,38 @@ def is_shorter_than_55_chars(s: str) -> bool:
 
 def is_keyword(s: str) -> bool:
     """True if the input is a valid Semantic Commit keyword."""
-    return s in [k.keyword for k in commit_keywords]
+    str_keywords = [k.keyword for k in commit_keywords]
+    if not s in str_keywords:
+        raise ValidationFailedException(
+            f"{s} is not a valid keyword. Should be one of: {str_keywords}"
+        )
+    else:
+        return True
 
 
 def is_semantic(s: str) -> bool:
     """True if the message corresponds to a Semantic Commit message."""
     kwds = "|".join([k.keyword for k in commit_keywords])
-    return matches(kwds + r"(\(.+\))?: .+")(s)
+    if not matches(kwds + r"(\(.+\))?: .+")(s):
+        raise ValidationFailedException(
+            "The message does not comply with a semantic commit formatting rules. "
+            f"Was {s}, but should look like e.g. 'feat: something implemented'"
+        )
+    else:
+        return True
 
 
 def has_short_commit_msg_proper_length(s: str) -> bool:
     """True if the included raw commit message (after colon) is less than
     55 characters.
     """
-    return is_shorter_than_55_chars(s.split(":")[1].strip())
+    desc = s.split(":")[1].strip()
+    if not is_shorter_than_55_chars(desc):
+        raise ValidationFailedException(
+            "The raw description included in the semantic commit message "
+            f"should be shorter than 55 characters, was {len(desc)}"
+        )
+    return True
 
 
 ask_keywords = lambda: ask(
