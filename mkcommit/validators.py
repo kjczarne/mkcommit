@@ -37,24 +37,31 @@ def max_len(limit: int) -> Validator:
     return _v
 
 
-def validate_initials(first_name_chars: int, last_name_chars: int) -> Validator:
+def validate_initials(
+    first_name_chars: int,
+    last_name_chars: int,
+    verbose: bool = False
+) -> Validator:
     def _v(msg: str) -> bool:
         tot = str(first_name_chars + last_name_chars)
         if not matches(r"\w{" + tot + r"}")(msg):
             return False
         else:
             if not msg[0].isupper():
-                print("Fist letter of the first name not uppercase!")
+                if verbose:
+                    print("Fist letter of the first name not uppercase!")
                 return False
             if not msg[1:first_name_chars].islower():
-                print("Letters of the first name not lowercase!")
+                if verbose:
+                    print("Letters of the first name not lowercase!")
                 return False
             if not msg[0 + first_name_chars].isupper():
-                print("First letter of the last name not uppercase!")
+                if verbose:
+                    print("First letter of the last name not uppercase!")
                 return False
             if not msg[first_name_chars + 1:first_name_chars + last_name_chars].islower():
-                print(msg[first_name_chars:first_name_chars + last_name_chars])
-                print("Letters of the last name not lowercase!")
+                if verbose:
+                    print("Letters of the last name not lowercase!")
                 return False
             if not len(msg) == first_name_chars + last_name_chars:
                 return False
