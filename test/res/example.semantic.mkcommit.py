@@ -2,8 +2,14 @@ from mkcommit import CommitMessage, to_stdout
 from mkcommit.suites import semantic
 
 
-c = CommitMessage(semantic.default_short())
+def commit():
+    return CommitMessage(semantic.default_short())
+
+
+def on_commit(msg: CommitMessage):
+    semantic.is_semantic(msg.first_line)
+    semantic.has_short_commit_msg_proper_length(msg.first_line)
 
 
 if __name__ == "__main__":
-    to_stdout(c)
+    to_stdout(commit())

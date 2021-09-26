@@ -1,5 +1,6 @@
-from mkcommit.model import Keyword, ask, CommaSeparatedList
-from mkcommit.validators import max_len
+from mkcommit.model import ValidationFailedException, ask, CommaSeparatedList
+from mkcommit.blocks import Keyword
+from mkcommit.validators import matches, max_len
 from mkcommit.editor_handler import editor
 
 commit_keywords = [
@@ -15,6 +16,51 @@ commit_keywords = [
     Keyword("clean", "Cleaned up unnecessary stuff")
 ]
 
+
+def is_shorter_than_55_chars(s: str) -> bool:
+    """True if the input is shorter than 55 characters."""
+    return max_len(55)(s)
+
+
+def is_keyword(s: str) -> bool:
+    """True if the input is a valid Semantic Commit keyword."""
+    str_keywords = [k.keyword for k in commit_keywords]
+    if not s in str_keywords:
+        raise ValidationFailedException(
+            f"{s} is not a valid keyword. Should be one of: {str_keywords}"
+        )
+    else:
+        return True
+
+
+def is_semantic(s: str) -> bool:
+    """True if the message corresponds to a Semantic Commit message."""
+    kwds = "(" + "|".join([k.keyword for k in commit_keywords]) + ")"
+    kwds_with_commas = "(" + "|".join([k.keyword + r", ?" for k in commit_keywords]) + ")"
+    # like: r"(feat|fix)(\(.+\))?: .+|(feat, ?|fix, ?)(feat|fix)(\(.+\))?: .+"
+    description = r"((\(.+\))?: .+)"
+    if not matches(kwds + description + "|" + kwds_with_commas + kwds + description)(s):
+        raise ValidationFailedException(
+            "The message does not comply with a semantic commit formatting rules. "
+            f"Was {s}, but should look like e.g. 'feat: something implemented'"
+        )
+    else:
+        return True
+
+
+def has_short_commit_msg_proper_length(s: str) -> bool:
+    """True if the included raw commit message (after colon) is less than
+    55 characters.
+    """
+    desc = s.split(":")[1].strip()
+    if not is_shorter_than_55_chars(desc):
+        raise ValidationFailedException(
+            "The raw description included in the semantic commit message "
+            f"should be shorter than 55 characters, was {len(desc)}"
+        )
+    return True
+
+
 ask_keywords = lambda: ask(
     "Select one or more keywords applicable (use TAB): ",
     one_or_more=commit_keywords
@@ -26,7 +72,7 @@ ask_scope = lambda: ask(
 
 ask_short_commit_msg = lambda: ask(
     "Provide the short commit msg, max 55 characters long: ",
-    check=max_len(55)
+    check=is_shorter_than_55_chars
 )
 
 ask_long_commit_msg = lambda: ask(

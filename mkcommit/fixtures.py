@@ -1,4 +1,5 @@
-from mkcommit.model import Keyword, Validator
+from mkcommit.blocks import Keyword
+from mkcommit.model import Validator
 from typing import List, Any, Optional
 
 

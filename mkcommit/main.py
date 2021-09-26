@@ -1,7 +1,9 @@
 import argparse
 import glob
 import os
+from types import ModuleType
 from typing import Callable, Optional, Union
+import warnings
 from InquirerPy import inquirer
 from enum import Enum
 import importlib.util
@@ -11,8 +13,9 @@ import pyperclip
 import subprocess
 
 from mkcommit.model import (
-    CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException, NotAGitRepoException,
-    WrongModeException, NoFilesFoundException, select, confirm
+    CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException, NotAGitRepoException, ValidationFailedException,
+    WrongModeException, NoFilesFoundException, select, confirm,
+    COMMIT_FUNC_NAME, PRE_COMMIT_FUNC_NAME, MODULE_SHIM
 )
 
 
@@ -21,6 +24,7 @@ class Mode(Enum):
     CLIPBOARD = "clipboard"
     BOTH = "both"
     RUN = "run"
+    HOOK = "hook"
 
 
 def to_stdout(msg: Union[str, CommitMessage]):
@@ -49,97 +53,97 @@ def to_cmd(msg: Union[str, CommitMessage]):
         print("Canceling.")
 
 
+def to_hook(msg: Union[str, CommitMessage]):
+    module = sys.modules[MODULE_SHIM]
+    if type(msg) is str:
+        raise TypeError(
+            f"Whatever is fed to {PRE_COMMIT_FUNC_NAME} should be "
+            f"a `CommitMessage` instance ({module.__file__}). This is likely a bug."
+        )
+    for name, obj in inspect.getmembers(module):
+        if inspect.isfunction(obj) and obj.__name__ == PRE_COMMIT_FUNC_NAME:
+            obj(msg)
+            return  # return `None` after running the hook
+    else:
+        warnings.warn(f"No hook implemented for template {module.__file__}")
+
+
 def _main(
     file: str,
     mode: Mode,
+    commit_msg_str_from_hook: Optional[str] = None,
     to_stdout: Callable[[Union[str, CommitMessage]], None] = to_stdout,
-    to_clipboard: Callable[[Union[str, CommitMessage]], None] = to_clipboard
+    to_clipboard: Callable[[Union[str, CommitMessage]], None] = to_clipboard,
+    to_cmd: Callable[[Union[str, CommitMessage]], None] = to_cmd,
+    to_hook: Callable[[Union[str, CommitMessage]], None] = to_hook
 ):
-    commit_message_instance: Optional[CommitMessage] = None
-    module_shim = "mkcommit.loaded_config"
-    spec = importlib.util.spec_from_file_location(
-        module_shim,
-        file
-    )
-
-    if spec:
-        cfg_module = importlib.util.module_from_spec(spec)
-        if spec.loader:
-            getattr(spec.loader, "exec_module")(cfg_module)
-        else:
-            raise ModuleLoaderException(
-                f"Loaded module ({file}) spec does not have a valid loader"
-            )
-        sys.modules[module_shim] = cfg_module
-    else:
-        raise ModuleLoaderException(f"Could not load module located at {file}")
-
-    for name, obj in inspect.getmembers(sys.modules[module_shim]):
-        if isinstance(obj, CommitMessage):
-            commit_message_instance = obj
-
-    if commit_message_instance is None:
-        raise FailedToFindCommitMessageException(
-            f"Module {file} seems to not declare any instance "
-            "of a `CommitMessage` class. Did you forget to instantiate?"
+    def _load_module(file: str):
+        spec = importlib.util.spec_from_file_location(
+            MODULE_SHIM,
+            file
         )
+
+        if spec:
+            cfg_module = importlib.util.module_from_spec(spec)
+            if spec.loader:
+                getattr(spec.loader, "exec_module")(cfg_module)
+            else:
+                raise ModuleLoaderException(
+                    f"Loaded module ({file}) spec does not have a valid loader"
+                )
+            sys.modules[MODULE_SHIM] = cfg_module
+        else:
+            raise ModuleLoaderException(f"Could not load module located at {file}")
+
+    def _get_commit_msg_from_module():
+        commit_message_instance: Optional[CommitMessage] = None
+        for name, obj in inspect.getmembers(sys.modules[MODULE_SHIM]):
+            if isinstance(obj, CommitMessage):
+                commit_message_instance = obj
+            elif inspect.isfunction(obj) and obj.__name__ == COMMIT_FUNC_NAME:
+                commit_message_instance = obj()
+        return commit_message_instance
+
+    def _check_commit_msg_exists(commit_message_instance: Optional[CommitMessage]) -> CommitMessage:
+        if commit_message_instance is None:
+            raise FailedToFindCommitMessageException(
+                f"Module {file} seems to not declare any instance "
+                "of a `CommitMessage` class. Did you forget to instantiate?"
+            )
+        else:
+            return commit_message_instance
+
+    _load_module(file)
+
+    if mode == mode.HOOK:
+        # in hook mode we check the message fed in as a command line argument
+        if commit_msg_str_from_hook is None:
+            raise ValueError("Commit message was empty!")
+        else:
+            lines = commit_msg_str_from_hook.splitlines()
+            first_line = lines[0]
+            if len(lines) > 1:
+                body: str = "\n".join(lines[1:])
+            else:
+                body: str = ""
+            commit_message_instance = CommitMessage(first_line, body)
+            to_hook(commit_message_instance)
+    elif mode == mode.STDOUT:
+        commit_message_instance = _get_commit_msg_from_module()
+        to_stdout(_check_commit_msg_exists(commit_message_instance))
+    elif mode == mode.CLIPBOARD:
+        commit_message_instance = _get_commit_msg_from_module()
+        to_clipboard(_check_commit_msg_exists(commit_message_instance))
+    elif mode == mode.BOTH:
+        commit_message_instance = _get_commit_msg_from_module()
+        m = _check_commit_msg_exists(commit_message_instance)
+        to_stdout(m)
+        to_clipboard(m)
+    elif mode == mode.RUN:
+        commit_message_instance = _get_commit_msg_from_module()
+        to_cmd(_check_commit_msg_exists(commit_message_instance))
     else:
-        if mode == mode.STDOUT:
-            to_stdout(commit_message_instance)
-        elif mode == mode.CLIPBOARD:
-            to_clipboard(commit_message_instance)
-        elif mode == mode.BOTH:
-            to_stdout(commit_message_instance)
-            to_clipboard(commit_message_instance)
-        elif mode == mode.RUN:
-            to_cmd(commit_message_instance)
-        else:
-            raise WrongModeException(f"You've used invalid mode: {mode}")
-
-
-def configurator():
-    parser = argparse.ArgumentParser(description="mkcommitconfig")
-    parser.add_argument(
-        "--addhook",
-        action="store_true",
-        help="Install `mkcommit` as a git pre-commit hook in the current repo"
-    )
-    parser.add_argument(
-        "--removehook",
-        action="store_true",
-        help="Remove `mkcommit` from `pre-commit` hooks"
-    )
-    
-    args = parser.parse_args()
-    
-    if args.addhook or args.removehook:
-        if not os.path.exists(".git"):
-            raise NotAGitRepoException(f"{os.getcwd()} is not a git repo!")
-        else:
-            precommit_path = ".git/hooks/pre-commit"
-            if os.path.exists(".git"):
-                if os.path.exists(precommit_path):
-                    with open(precommit_path, "r") as f:
-                        contents = f.read()
-                else:
-                    open(precommit_path, "w").close()
-                    contents = ""
-                if args.addhook:
-                    if "mkcommit" in contents:
-                        print(f"`mkcommit` has already been configured for repo {os.getcwd()}")
-                    else:
-                        with open(precommit_path, "a") as f:
-                            f.write("mkcommit")
-                        print(f"`mkcommit` hook installed for local repo {os.getcwd()}")
-                else:
-                    if "mkcommit" in contents:
-                        with open(precommit_path, "r") as f:
-                            contents = f.read()
-                        with open(precommit_path, "w") as f:
-                            f.write(contents.replace("mkcommit", ""))
-                        print(f"`mkcommit` hook removed for repo {os.getcwd()}")
-                    else:
-                        print(f"`mkcommit` has never been installed for repo {os.getcwd()}")
+        raise WrongModeException(f"You've used invalid mode: {mode}")
 
 
 def main():
@@ -163,6 +167,16 @@ def main():
                         action='store_true', help="Executes `git commit -m` with whatever output "
                         "was produced by `mkcommit`"
                         )
+    parser.add_argument('-x', '--hook',
+                        type=str, help="Runs `mkcommit` solely in hook mode, "
+                        "i.e. doesn't generate a commit message but validates the one "
+                        "provided on the command line. "
+                        "This is intended to be used mainly as an entrypoint for `pre-commit` "
+                        "hooks"
+                        )
+    parser.add_argument('-a', '--autoselect',
+                        action="store_true", help="Automatically selects "
+                        "the first found `*.mkcommit.py` file")
 
     args = parser.parse_args()
 
@@ -174,6 +188,11 @@ def main():
         mode = Mode.STDOUT
     else:
         mode = Mode.RUN  # Run is default mode
+    
+    # if in hook mode, we should override the whole behavior to a hook,
+    # so no `to_stdout` and no `to_clipboard` calls will be heeded:
+    if args.hook:
+        mode = Mode.HOOK
 
     def _find_files_and_run(root: str):
         with_root = lambda p: os.path.join(root, p)
@@ -183,15 +202,19 @@ def main():
             mkcommit_files.append(with_root(".mkcommit.py"))
         if len(mkcommit_files) == 0:
             raise NoFilesFoundException("No `*.mkcommit.py` files found")
-        selected_file = select(
-            "Select one of the following files I've found", mkcommit_files)
+        if args.autoselect:
+            print(os.getcwd())
+            selected_file = mkcommit_files[0]
+        else:
+            selected_file = select(
+                "Select one of the following files I've found", mkcommit_files)
         if type(selected_file) is str:
-            _main(selected_file, mode)
+            _main(selected_file, mode, args.hook)
         else:
             raise TypeError("Result was not a string. This is a bug!")
 
     if args.file:
-        _main(args.file, mode)
+        _main(args.file, mode, args.hook)
     else:
         if os.path.exists(".mkcommit"):
             try:
