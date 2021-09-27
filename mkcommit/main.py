@@ -46,7 +46,7 @@ def to_cmd(msg: Union[str, CommitMessage]):
         msg_str = msg
     yes = confirm(f"The commit message is:\n{msg_str}\n Confirm?")
     if yes:
-        subprocess.call(("git", "commit", "-m", "msg_str"))
+        subprocess.call(("git", "commit", "-m", f"\"{msg_str}\""))
     else:
         print("Canceling.")
 
