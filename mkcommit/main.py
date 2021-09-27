@@ -42,11 +42,15 @@ def to_clipboard(msg: Union[str, CommitMessage]):
 def to_cmd(msg: Union[str, CommitMessage]):
     if type(msg) is CommitMessage:
         msg_str = msg.make()
+    elif type(msg) is str:
+        msg_str: str = msg
     else:
-        msg_str = msg
+        raise TypeError(
+            f"Commit message should be `str` or `CommitMessage`, was {type(msg)}"
+        )
     yes = confirm(f"The commit message is:\n{msg_str}\n Confirm?")
     if yes:
-        subprocess.call(("git", "commit", "-m", f"\"{msg_str}\""))
+        subprocess.call(("git", "commit", "-m", msg_str))
     else:
         print("Canceling.")
 
