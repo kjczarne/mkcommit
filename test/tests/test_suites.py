@@ -31,11 +31,13 @@ class TestSemantic(Fixture):
             "feat, fix: adfsasdfas",
             "feat,fix: asdfasdfasdf",
             "feat(asdf),fix(asda),feat, fix(asda): asdfasdfasdf",
+            "feat,fix!: asdfasdfasdf",
         ]
         cls.semantic_invalid = [
             "asdf(blah): adsf",
             "asdf,feat(blah): asdf",
             "asdfa, feat(blah): asdfg",
+            "feat,fix?: asdfasdfasdf",
         ]
         cls.semantic_valid_msg_len = ["feat: asdfasdf"]
         cls.semantic_invalid_msg_len = ["feat: " + "a" * 56]
