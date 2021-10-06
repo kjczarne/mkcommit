@@ -32,6 +32,8 @@ class TestSemantic(Fixture):
             "feat,fix: asdfasdfasdf",
             "feat(asdf),fix(asda),feat, fix(asda): asdfasdfasdf",
             "feat,fix!: asdfasdfasdf",
+            "Merge branch a into b",
+            "Merge branch chore/123/something into develop",
         ]
         cls.semantic_invalid = [
             "asdf(blah): adsf",
