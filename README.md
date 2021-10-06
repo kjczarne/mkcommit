@@ -1,6 +1,6 @@
 # mkcommit
 
-<img src="static/logo.png" width="150" style="display: block;margin-left: auto;margin-right: auto;">
+<img src="static/logo.png" width="300" style="display: block;margin-left: auto;margin-right: auto;">
 
 `mkcommit` is an extremely simple tool made for commit message generation.
 
