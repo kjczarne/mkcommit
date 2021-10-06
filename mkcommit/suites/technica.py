@@ -36,13 +36,16 @@ def ticket_id_correctly_formatted(s: str) -> bool:
     return matches(r"^\w+-\d+$|^---$|^-$")(s)
 
 
-def is_technica(s: str, ticket_first: bool = False) -> bool:
+def is_technica(s: str, ticket_first: bool = False, allow_default_merge_msg: bool = True) -> bool:
     two_parts = s.split("]")
     if len(two_parts) < 2:
-        raise ValidationFailedException(
-            f"{s} could not be split on ']' character. "
-            "The commit message seems malformed!"
-        )
+        if allow_default_merge_msg and matches(r"Merge branch.*")(s):
+            return True
+        else:
+            raise ValidationFailedException(
+                f"{s} could not be split on ']' character. "
+                "The commit message seems malformed!"
+            )
     else:
         preamble = two_parts[0].strip()
         semantic_part = two_parts[1].strip()

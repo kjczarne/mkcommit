@@ -72,6 +72,8 @@ class TestTechnica(Fixture):
             "[KrCz/project-1234] feat,fix(context): asdfads",
             "[KrCz/---] feat: lol",
             "[KrCz/-] feat: lol",
+            "Merge branch a into b",
+            "Merge branch chore/123/something into develop",
         ]
         cls.technica_invalid = [
             "[KrCZ/PROJECT-1234] feat,fix(context): asdfads",
