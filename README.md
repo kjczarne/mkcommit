@@ -60,7 +60,7 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
     commit, on_commit = include("https://raw.githubusercontent.com/kjczarne/mkcommit/master/test/res/example.semantic.mkcommit.py")
 
     if __name__ == "__main__":
-    to_stdout(commit())
+        to_stdout(commit())
     ```
 
 3. Run `mkcommit`. Select the discovered configuration file for the list and follow the interactive prompt.
