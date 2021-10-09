@@ -51,6 +51,18 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
     If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
 
     If you want to learn how to use the hook mode, read [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks) in our Wiki.
+
+    When you have implemented the file in one repo and want to use the **exact same** file in another repo, you should use `include` e.g.
+
+    ```python
+    from mkcommit import to_stdout, include
+
+    commit, on_commit = include("https://raw.githubusercontent.com/kjczarne/mkcommit/master/test/res/example.semantic.mkcommit.py")
+
+    if __name__ == "__main__":
+    to_stdout(commit())
+    ```
+
 3. Run `mkcommit`. Select the discovered configuration file for the list and follow the interactive prompt.
 
 ## Usage

@@ -4,18 +4,19 @@ import os
 from typing import Callable, Optional, Union
 import warnings
 from enum import Enum
-import importlib.util
 import inspect
 import sys
 import pyperclip
 import subprocess
 
 from mkcommit.model import (
-    CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException,
-    WrongModeException, NoFilesFoundException, select, confirm,
-    COMMIT_FUNC_NAME, PRE_COMMIT_FUNC_NAME, MODULE_SHIM
+    CommitMessage, WrongModeException, NoFilesFoundException, select, confirm,
+    PRE_COMMIT_FUNC_NAME, MODULE_SHIM
 )
 
+from mkcommit.module_utils import (
+    get_on_commit_func_from_module, load_module, check_commit_msg_exists, get_commit_msg_from_module
+)
 
 class Mode(Enum):
     STDOUT = "stdout"
@@ -57,15 +58,16 @@ def to_cmd(msg: Union[str, CommitMessage]):
 
 def to_hook(msg: Union[str, CommitMessage]):
     module = sys.modules[MODULE_SHIM]
-    if type(msg) is str:
-        raise TypeError(
-            f"Whatever is fed to {PRE_COMMIT_FUNC_NAME} should be "
-            f"a `CommitMessage` instance ({module.__file__}). This is likely a bug."
-        )
-    for name, obj in inspect.getmembers(module):
-        if inspect.isfunction(obj) and obj.__name__ == PRE_COMMIT_FUNC_NAME:
-            obj(msg)
-            return  # return `None` after running the hook
+    hook_func = get_on_commit_func_from_module()
+    if hook_func:
+        if type(msg) is CommitMessage:
+            hook_func(msg)
+        else:
+            raise TypeError(
+                f"Whatever is fed to {PRE_COMMIT_FUNC_NAME} should be "
+                f"a `CommitMessage` instance ({module.__file__}). This is likely a bug."
+            )
+        return  # return `None` after running the hook
     else:
         warnings.warn(f"No hook implemented for template {module.__file__}")
 
@@ -79,43 +81,7 @@ def _main(  # noqa: C901
     to_cmd: Callable[[Union[str, CommitMessage]], None] = to_cmd,
     to_hook: Callable[[Union[str, CommitMessage]], None] = to_hook
 ):
-    def _load_module(file: str):
-        spec = importlib.util.spec_from_file_location(
-            MODULE_SHIM,
-            file
-        )
-
-        if spec:
-            cfg_module = importlib.util.module_from_spec(spec)
-            if spec.loader:
-                getattr(spec.loader, "exec_module")(cfg_module)
-            else:
-                raise ModuleLoaderException(
-                    f"Loaded module ({file}) spec does not have a valid loader"
-                )
-            sys.modules[MODULE_SHIM] = cfg_module
-        else:
-            raise ModuleLoaderException(f"Could not load module located at {file}")
-
-    def _get_commit_msg_from_module():
-        commit_message_instance: Optional[CommitMessage] = None
-        for name, obj in inspect.getmembers(sys.modules[MODULE_SHIM]):
-            if isinstance(obj, CommitMessage):
-                commit_message_instance = obj
-            elif inspect.isfunction(obj) and obj.__name__ == COMMIT_FUNC_NAME:
-                commit_message_instance = obj()
-        return commit_message_instance
-
-    def _check_commit_msg_exists(commit_message_instance: Optional[CommitMessage]) -> CommitMessage:
-        if commit_message_instance is None:
-            raise FailedToFindCommitMessageException(
-                f"Module {file} seems to not declare any instance "
-                "of a `CommitMessage` class. Did you forget to instantiate?"
-            )
-        else:
-            return commit_message_instance
-
-    _load_module(file)
+    load_module(file)
 
     if mode == mode.HOOK:
         # in hook mode we check the message fed in as a command line argument
@@ -131,19 +97,19 @@ def _main(  # noqa: C901
             commit_message_instance = CommitMessage(first_line, body)
             to_hook(commit_message_instance)
     elif mode == mode.STDOUT:
-        commit_message_instance = _get_commit_msg_from_module()
-        to_stdout(_check_commit_msg_exists(commit_message_instance))
+        commit_message_instance = get_commit_msg_from_module()
+        to_stdout(check_commit_msg_exists(commit_message_instance, file))
     elif mode == mode.CLIPBOARD:
-        commit_message_instance = _get_commit_msg_from_module()
-        to_clipboard(_check_commit_msg_exists(commit_message_instance))
+        commit_message_instance = get_commit_msg_from_module()
+        to_clipboard(check_commit_msg_exists(commit_message_instance, file))
     elif mode == mode.BOTH:
-        commit_message_instance = _get_commit_msg_from_module()
-        m = _check_commit_msg_exists(commit_message_instance)
+        commit_message_instance = get_commit_msg_from_module()
+        m = check_commit_msg_exists(commit_message_instance, file)
         to_stdout(m)
         to_clipboard(m)
     elif mode == mode.RUN:
-        commit_message_instance = _get_commit_msg_from_module()
-        to_cmd(_check_commit_msg_exists(commit_message_instance))
+        commit_message_instance = get_commit_msg_from_module()
+        to_cmd(check_commit_msg_exists(commit_message_instance, file))
     else:
         raise WrongModeException(f"You've used invalid mode: {mode}")
 

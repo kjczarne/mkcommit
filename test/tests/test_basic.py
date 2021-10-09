@@ -1,9 +1,14 @@
+from mkcommit.include import include
 import os
 import unittest
 import pyperclip
+import shutil
 
 from mkcommit.main import _main, Mode
-from mkcommit.model import CommaSeparatedList, ValidationFailedException
+from mkcommit.model import (
+    CommaSeparatedList, ValidationFailedException, COMMIT_FUNC_NAME, PRE_COMMIT_FUNC_NAME
+)
+from mkcommit.include import DEFAULT_TEMP_PATH
 
 
 class TestBasic(unittest.TestCase):
@@ -75,6 +80,27 @@ class TestBasic(unittest.TestCase):
                 Mode.HOOK,
                 "KrCz | asdf"
             )
+
+    def test_include(self):
+        url = "https://raw.githubusercontent.com/" + \
+              "kjczarne/mkcommit/master/test/res/example.semantic.mkcommit.py"
+        url2 = "https://raw.githubusercontent.com/" + \
+              "kjczarne/mkcommit/master/test/res/example.hook.mkcommit.py"
+        commit, on_commit = include(url)
+        commit2, on_commit2 = include(url2, "temp.mkcommit.py")
+        if on_commit is None or on_commit2 is None:
+            self.fail(f"`{PRE_COMMIT_FUNC_NAME}` was `None`")
+        else:
+            self.assertEqual(commit.__name__, COMMIT_FUNC_NAME)
+            self.assertEqual(on_commit.__name__, PRE_COMMIT_FUNC_NAME)
+            self.assertEqual(commit2.__name__, COMMIT_FUNC_NAME)
+            self.assertEqual(on_commit2.__name__, PRE_COMMIT_FUNC_NAME)
+        if not os.path.exists(os.path.join(DEFAULT_TEMP_PATH, "temp.mkcommit.py")):
+            self.fail("`include` call with named tempfile failed")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(DEFAULT_TEMP_PATH)
 
 
 if __name__ == "__main__":

@@ -113,6 +113,8 @@ Validator = Callable[[str], bool]
 ValidatorClosure = Callable[..., Validator]
 T = TypeVar("T")
 Rule = Callable[[str], T]
+CommitFunc = Callable[[], CommitMessage]
+OnCommitFunc = Callable[[CommitMessage], None]
 
 
 def select(question: str, one_of: List[Any]):
