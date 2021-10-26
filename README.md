@@ -42,7 +42,7 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
     from mkcommit.suites import semantic
 
     def commit():
-        return CommitMessage(semantic.default_short())
+        return CommitMessage(semantic.default_short() + semantic.default_long())
 
     if __name__ == "__main__":
         to_stdout(commit())

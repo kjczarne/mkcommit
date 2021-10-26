@@ -103,4 +103,8 @@ def default_short() -> str:
 
 
 def default_long() -> str:
-    return editor()
+    switch = ask("Do you wish to add a longer message?", yes_no=True)
+    if switch:
+        return "\n\n" + editor()
+    else:
+        return ""
