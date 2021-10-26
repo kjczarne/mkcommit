@@ -51,7 +51,8 @@ def _add_to_configs_map(
 def _get_mkcommit_config_from_url(
     url: str,
     target_temp_file_name: str,
-    temp_path: str = DEFAULT_TEMP_PATH,
+    cert_path: Optional[str] = None,
+    temp_path: str = DEFAULT_TEMP_PATH
 ) -> str:
     # first try and load the cached config:
     configs_map = _get_configs_map()
@@ -59,7 +60,7 @@ def _get_mkcommit_config_from_url(
         target_file_path = os.path.join(temp_path, configs_map[url])
     except KeyError:
         # if there is none, get one from remote:
-        response = requests.get(url)
+        response = requests.get(url, verify=cert_path)
         logger.debug(f"Return code from {url} was {response.status_code}")
         response.raise_for_status()
         
@@ -82,7 +83,8 @@ def _get_mkcommit_config_from_url(
 
 def include(
     url: str,
-    target_temp_file_name: Optional[str] = None
+    target_temp_file_name: Optional[str] = None,
+    cert: Optional[str] = None
 ) -> Tuple[CommitFunc, Optional[OnCommitFunc]]:
 
     _create_cache()
@@ -96,7 +98,7 @@ def include(
         inferred_temp_file_name = binascii.hexlify(url_hash).decode("UTF-8")
         inferred_temp_file_name += ".py"
 
-    target_path = _get_mkcommit_config_from_url(url, inferred_temp_file_name)
+    target_path = _get_mkcommit_config_from_url(url, inferred_temp_file_name, cert)
 
     load_module(target_path)
 
