@@ -2,6 +2,7 @@ from typing import Callable, List
 from mkcommit.model import ValidationFailedException
 import unittest
 from mkcommit.suites import semantic
+from mkcommit.suites import conventional
 from mkcommit.suites import technica
 
 
@@ -56,6 +57,38 @@ class TestSemantic(Fixture):
             self.semantic_valid_msg_len,
             self.semantic_invalid_msg_len,
             semantic.has_short_commit_msg_proper_length
+        )
+
+
+class TestConventional(Fixture):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.conventional_valid = [
+            "feat(scope): badsfasdf",
+            "feat: asdfadsfasdf",
+            "feat(scope)!: badsfasdf",
+            "feat!: asdfadsfasdf",
+            "Merge branch a into b",
+            "Merge branch chore/123/something into develop",
+        ]
+        cls.conventional_invalid = [
+            "asdf(blah): adsf",
+            "asdf,feat(blah): asdf",
+            "asdfa, feat(blah): asdfg",
+            "feat,fix?: asdfasdfasdf",
+            "feat, fix: adfsasdfas",
+            "feat,fix: asdfasdfasdf",
+            "feat(asdf),fix(asda),feat, fix(asda): asdfasdfasdf",
+            "feat,fix!: asdfasdfasdf",
+            "feat(blah has space): adsf",
+        ]
+
+    def test_conventional(self):
+        self.eval_list(
+            self.conventional_valid,
+            self.conventional_invalid,
+            conventional.is_conventional
         )
 
 
