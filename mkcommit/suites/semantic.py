@@ -118,7 +118,7 @@ ask_breaking = lambda: ask(
 
 
 def _make_first_line(
-    scope: Optional[str]
+    scope: str
 ) -> Callable[[str, str, str], str]:
 
     def closure(
@@ -126,7 +126,7 @@ def _make_first_line(
         breaking_mark: str,
         subject: str
     ):
-        if scope is not None:
+        if len(scope) > 0:
             return f"{keywords}({scope}){breaking_mark}: {subject}"
         else:
             return f"{keywords}{breaking_mark}: {subject}"
