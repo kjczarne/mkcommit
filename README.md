@@ -35,33 +35,33 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 1. At the root of your repository create a Python file named `my_repo.mkcommit.py`.
 2. Compose the script:
 
-    A built-in _semantic commit_ suite can be used:
+    - A built-in _conventional commit_ suite can be used:
 
-    ```python
-    from mkcommit import CommitMessage, to_stdout
-    from mkcommit.suites import semantic
+        ```python
+        from mkcommit import CommitMessage, to_stdout
+        from mkcommit.suites import conventional
 
-    def commit():
-        return CommitMessage(semantic.default_short(), semantic.default_long())
+        def commit():
+            return CommitMessage(*conventional.default())
 
-    if __name__ == "__main__":
-        to_stdout(commit())
-    ```
+        if __name__ == "__main__":
+            to_stdout(commit())
+        ```
 
-    If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
+    - If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
 
-    If you want to learn how to use the hook mode, read [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks) in our Wiki.
+        - If you want to learn how to use the hook mode, read [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks) in our Wiki.
 
-    When you have implemented the file in one repo and want to use the **exact same** file in another repo, you should use `include` e.g.
+    - When you have implemented the file in one repo and want to use the **exact same** file in another repo, you should use `include` e.g.
 
-    ```python
-    from mkcommit import to_stdout, include
+        ```python
+        from mkcommit import to_stdout, include
 
-    commit, on_commit = include("https://raw.githubusercontent.com/kjczarne/mkcommit/master/test/res/example.semantic.mkcommit.py")
+        commit, on_commit = include("https://raw.githubusercontent.com/kjczarne/mkcommit/master/test/res/example.semantic.mkcommit.py")
 
-    if __name__ == "__main__":
-        to_stdout(commit())
-    ```
+        if __name__ == "__main__":
+            to_stdout(commit())
+        ```
 
 3. Run `mkcommit`. Select the discovered configuration file for the list and follow the interactive prompt.
 
@@ -79,3 +79,7 @@ If you wish to point `mkcommit` to a specific configuration file, use `mkcommit 
 The most basic validation strategy we use is [validation at the time of message generation](https://github.com/kjczarne/mkcommit/wiki/Validators).
 
 For validation of commit messages that aren't originally generated with `mkcommit` you can use [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks).
+
+### Built-in suites
+
+A list of suites that are supported out-of-the-box can be found in our [Wiki](https://github.com/kjczarne/mkcommit/wiki/Suites).
