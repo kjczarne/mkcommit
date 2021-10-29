@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Tuple
 from mkcommit.model import CommaSeparatedList, ValidationFailedException, ask
 from mkcommit.blocks import Project
 from mkcommit.model import Author as BaseAuthor
@@ -128,3 +128,11 @@ def default_short(
 
 
 default_long = semantic.default_long
+
+
+def default(
+    project: Project,
+    ticket_first: bool = False,
+    initials_from_git: bool = True
+) -> Tuple[str, str]:
+    return default_short(project, ticket_first, initials_from_git), default_long()
