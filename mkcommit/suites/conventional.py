@@ -106,6 +106,7 @@ def find_trailer(lines: Sequence[str]) -> Tuple[int, int]:
     """
     trailer_lines = 0
     comment_lines = 0
+    index = 0
     for index in range(len(lines) - 1, -1, -1):
         line = lines[index]
         if line.startswith("#"):
