@@ -3,39 +3,22 @@ from typing import Tuple, Sequence
 from mkcommit.model import ValidationFailedException, ask
 from mkcommit.blocks import Keyword
 from mkcommit.validators import matches
-from mkcommit.editor_handler import editor
+from mkcommit.suites import semantic
 
-type_keywords = [
-    Keyword("feat", "A new feature"),
-    Keyword("fix", "A bug fix"),
-    Keyword("docs", "Documentation only changes"),
-    Keyword("style", "Changes that do not affect the meaning of the code"),
-    Keyword("refactor", "A code change that neither fixes a bug nor adds a feature"),
+type_keywords = semantic.commit_keywords + [
     Keyword("perf", "A code change that improves performance"),
-    Keyword("test", "Adding missing tests or correcting existing tests"),
     Keyword("build", "Changes that affect the build system or external dependencies"),
     Keyword("ci", "Changes to our CI configuration files and scripts"),
-    Keyword("chore", "Other changes that don't modify src or test files"),
-    Keyword("revert", "Reverts a previous commit"),
 ]
 
 
 def is_conventional(s: str, allow_default_merge_msg: bool = True) -> bool:
-    types = "(" + "|".join([k.keyword for k in type_keywords]) + ")"
-    scope = r"(\(.+\))?"
-    breaking = r"!?"
-    subject = r".+"
-    if allow_default_merge_msg:
-        merge_msg = "Merge branch.*|"
-    else:
-        merge_msg = ""
-
-    expression = f"{merge_msg}{types}{scope}{breaking}: {subject}"
-    if not matches(expression)(s):
-        raise ValidationFailedException(
-            "The message is not a valid Conventional Commit"
-        )
-    return True
+    """Returns `true` if the message is a valid Conventional Commit"""
+    return semantic._is_semantic_with_custom_keyword_set(
+        type_keywords,
+        allow_keywords_with_commas=False,
+        validation_error_message="The message is not a valid Conventional Commit"
+    )(s, allow_default_merge_msg)
 
 
 def is_word(s: str) -> bool:
@@ -179,11 +162,7 @@ def basic_short() -> str:
 
 
 def default_long() -> str:
-    switch = ask("Do you wish to add a longer message?", yes_no=True)
-    if switch:
-        return editor()
-    else:
-        return ""
+    return semantic.default_long()
 
 
 def default() -> Tuple[str, str]:
@@ -193,10 +172,7 @@ def default() -> Tuple[str, str]:
     breaking_mark, breaking_trailer = default_breaking()
     long = default_long()
 
-    if scope:
-        short = f"{type}({scope}){breaking_mark}: {subject}"
-    else:
-        short = f"{type}{breaking_mark}: {subject}"
+    short = semantic._make_first_line(scope)(type, breaking_mark, subject)
 
     if breaking_trailer:
         long = attach_trailer(long, breaking_trailer)

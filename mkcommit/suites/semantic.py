@@ -1,19 +1,19 @@
+from typing import Callable, List, Optional, Tuple
 from mkcommit.model import ValidationFailedException, ask, CommaSeparatedList
 from mkcommit.blocks import Keyword
 from mkcommit.validators import matches, max_len
 from mkcommit.editor_handler import editor
 
 commit_keywords = [
-    Keyword("feat", "New Feature"),
-    Keyword("fix", "Bug Fix"),
-    Keyword("chore", "Generic task"),
-    Keyword("wip", "Work in progress"),
-    Keyword("doc", "Documentation updated"),
-    Keyword("refactor", "Refactoring something"),
-    Keyword("test", "Added a test, tested an element"),
-    Keyword("revert", "Revert a previous change"),
-    Keyword("style", "Improved code style"),
-    Keyword("clean", "Cleaned up unnecessary stuff")
+    Keyword("feat", "A new feature"),
+    Keyword("fix", "A bug fix"),
+    Keyword("docs", "Documentation only changes"),
+    Keyword("style", "Changes that do not affect the meaning of the code"),
+    Keyword("refactor", "A code change that neither fixes a bug nor adds a feature"),
+    Keyword("wip", "Work in progress (think whether it really should be committed first)"),
+    Keyword("test", "Adding missing tests or correcting existing tests"),
+    Keyword("chore", "Other changes that don't modify src or test files"),
+    Keyword("revert", "Reverts a previous commit"),
 ]
 
 
@@ -33,25 +33,51 @@ def is_keyword(s: str) -> bool:
         return True
 
 
+def _is_semantic_with_custom_keyword_set(
+    commit_keywords: List[Keyword],
+    allow_keywords_with_commas: bool,
+    validation_error_message: str
+) -> Callable[[str, bool], bool]:
+
+    def closure(s: str, allow_default_merge_msg: bool = True):
+        scope = r"(\([^, ]+\))?"
+        breaking = r"!?"
+
+        kwds = "(" + "|".join([
+            "(" + k.keyword + scope + breaking + ")"
+            for k in commit_keywords]) + ")"
+
+        kwds_with_commas = "(" + "|".join([
+            "((" + k.keyword + scope + breaking + ")" + r", ?" + ")"
+            for k in commit_keywords]) + ")"
+
+        subject = r"[^,]+"
+        if allow_default_merge_msg:
+            merge_msg = "Merge branch.*|"
+        else:
+            merge_msg = ""
+
+        expression = f"^{merge_msg}{kwds}: {subject}"
+        if allow_keywords_with_commas:
+            expression = f"{expression}|^{merge_msg}{kwds_with_commas}+{kwds}: {subject}"
+        if not matches(expression)(s):
+            raise ValidationFailedException(
+                validation_error_message
+            )
+        return True
+
+    return closure
+
+
 def is_semantic(s: str, allow_default_merge_msg: bool = True) -> bool:
     """True if the message corresponds to a Semantic Commit message."""
-    kwds = "(" + "|".join([k.keyword for k in commit_keywords]) + ")"
-    kwds_with_commas = "(" + "|".join([k.keyword + r", ?" for k in commit_keywords]) + ")"
-    # like: r"(feat|fix)(\(.+\))?: .+|(feat, ?|fix, ?)(feat|fix)(\(.+\))?: .+"
-    description = r"((\(.+\))?!?: .+)"
-    if allow_default_merge_msg:
-        merge_msg = "Merge branch.*|"
-    else:
-        merge_msg = ""
-    if not matches(
-        merge_msg + kwds + description + "|" + kwds_with_commas + kwds + description
-    )(s):
-        raise ValidationFailedException(
-            "The message does not comply with a semantic commit formatting rules. "
-            f"Was {s}, but should look like e.g. 'feat: something implemented'"
-        )
-    else:
-        return True
+    return _is_semantic_with_custom_keyword_set(
+        commit_keywords,
+        allow_keywords_with_commas=True,
+        validation_error_message="The message does not comply with "
+                                 "semantic commit formatting rules. "
+                                 f"Was {s}, but should look like e.g. 'feat: something implemented'"
+    )(s, allow_default_merge_msg)
 
 
 def has_short_commit_msg_proper_length(s: str) -> bool:
@@ -91,15 +117,29 @@ ask_breaking = lambda: ask(
 )
 
 
+def _make_first_line(
+    scope: Optional[str]
+) -> Callable[[str, str, str], str]:
+
+    def closure(
+        keywords: str,
+        breaking_mark: str,
+        subject: str
+    ):
+        if scope is not None:
+            return f"{keywords}({scope}){breaking_mark}: {subject}"
+        else:
+            return f"{keywords}{breaking_mark}: {subject}"
+
+    return closure
+
+
 def default_short() -> str:
-    keywords = CommaSeparatedList(*[k.keyword for k in ask_keywords()])
+    keywords = str(CommaSeparatedList(*[k.keyword for k in ask_keywords()]))
     scope = ask_scope()
     short_commit = ask_short_commit_msg()
     breaking = "!" if ask_breaking() else ""
-    if scope:
-        return f"{keywords}({scope}){breaking}: {short_commit}"
-    else:
-        return f"{keywords}{breaking}: {short_commit}"
+    return _make_first_line(scope)(keywords, breaking, short_commit)
 
 
 def default_long() -> str:
@@ -108,3 +148,7 @@ def default_long() -> str:
         return editor()
     else:
         return ""
+
+
+def default() -> Tuple[str, str]:
+    return default_short(), default_long()
