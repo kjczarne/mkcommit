@@ -1,15 +1,15 @@
-from mkcommit.module_utils import check_commit_msg_exists, get_commit_msg_from_module, get_commit_msg_func_from_module, get_on_commit_func_from_module, load_module
-from mkcommit.model import CommitFunc, CommitMessage, NoFilesFoundException, OnCommitFunc
-from typing import Any, Dict, List, Optional, Tuple
+from mkcommit.module_utils import (
+    get_commit_msg_func_from_module, get_on_commit_func_from_module, load_module
+)
+from mkcommit.model import CommitFunc, NoFilesFoundException, OnCommitFunc
+from typing import Dict, Optional, Tuple
 import requests
 import os
-import sys
 import shutil
 import logging
 import yaml
 import hashlib
 import binascii
-import inspect
 
 
 DEFAULT_TEMP_PATH: str = ".mkcommit-cache"
@@ -34,7 +34,7 @@ def _get_configs_map(temp_path: str = DEFAULT_TEMP_PATH) -> Dict[str, str]:
         with open(configs_map_path, "r") as f:
             configs_map = yaml.full_load(f)
     return configs_map
-        
+
 
 def _add_to_configs_map(
     source_url: str,
@@ -63,21 +63,21 @@ def _get_mkcommit_config_from_url(
         response = requests.get(url, verify=cert_path)
         logger.debug(f"Return code from {url} was {response.status_code}")
         response.raise_for_status()
-        
+
         target_file_path = os.path.join(temp_path, target_temp_file_name)
-        
+
         logger.debug(f"Attempting to write the file to {target_file_path}")
         with open(target_file_path, "w") as f:
             f.write(response.text)
-        
+
         logger.debug(f"Successfully written {url} to {target_file_path}")
-        
+
         logger.debug(f"Attempting to add {url} config to configs.yaml")
-        
+
         _add_to_configs_map(url, target_temp_file_name)
-        
+
         logger.debug(f"{url} config successfully added to configs.yaml")
-    
+
     return target_file_path
 
 

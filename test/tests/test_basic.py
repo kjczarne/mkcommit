@@ -85,7 +85,7 @@ class TestBasic(unittest.TestCase):
         url = "https://raw.githubusercontent.com/" + \
               "kjczarne/mkcommit/master/test/res/example.semantic.mkcommit.py"
         url2 = "https://raw.githubusercontent.com/" + \
-              "kjczarne/mkcommit/master/test/res/example.hook.mkcommit.py"
+               "kjczarne/mkcommit/master/test/res/example.hook.mkcommit.py"
         commit, on_commit = include(url)
         commit2, on_commit2 = include(url2, "temp.mkcommit.py")
         if on_commit is None or on_commit2 is None:

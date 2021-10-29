@@ -4,8 +4,8 @@ import sys
 from typing import Optional
 
 from mkcommit.model import (
-    PRE_COMMIT_FUNC_NAME, CommitFunc, CommitMessage, FailedToFindCommitMessageException, ModuleLoaderException,
-    COMMIT_FUNC_NAME, MODULE_SHIM, OnCommitFunc
+    PRE_COMMIT_FUNC_NAME, CommitFunc, CommitMessage, FailedToFindCommitMessageException,
+    ModuleLoaderException, COMMIT_FUNC_NAME, MODULE_SHIM, OnCommitFunc
 )
 
 

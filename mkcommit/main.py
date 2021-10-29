@@ -4,7 +4,6 @@ import os
 from typing import Callable, Optional, Union
 import warnings
 from enum import Enum
-import inspect
 import sys
 import pyperclip
 import subprocess
@@ -17,6 +16,7 @@ from mkcommit.model import (
 from mkcommit.module_utils import (
     get_on_commit_func_from_module, load_module, check_commit_msg_exists, get_commit_msg_from_module
 )
+
 
 class Mode(Enum):
     STDOUT = "stdout"

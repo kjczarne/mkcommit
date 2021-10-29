@@ -82,9 +82,9 @@ def find_trailer(lines: Sequence[str]) -> Tuple[int, int]:
     (1, 2)
     >>> find_trailer(["Line 1: Content", "Line 2: Content", "", "Trailer-token: Value"])
     (3, 4)
-    >>> find_trailer(["Line 1: Content", "Line 2: Content", "", "# Comment", "Trailer-token: Value"])
+    >>> find_trailer(["Line 1: Content", "Line 2: Content", "", "# Comment", "Trailer-token: Value"])  # noqa: E501
     (3, 5)
-    >>> find_trailer(["Line 1: Content", "Line 2: Content", "", "# Comment", "# Comment", "Trailer-token: Value"])
+    >>> find_trailer(["Line 1: Content", "Line 2: Content", "", "# Comment", "# Comment", "Trailer-token: Value"])  # noqa: E501
     (3, 6)
     """
     trailer_lines = 0

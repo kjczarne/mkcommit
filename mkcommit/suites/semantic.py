@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Tuple
 from mkcommit.model import ValidationFailedException, ask, CommaSeparatedList
 from mkcommit.blocks import Keyword
 from mkcommit.validators import matches, max_len
