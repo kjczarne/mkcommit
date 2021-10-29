@@ -6,7 +6,8 @@ def commit():
     project = Project("Some project", "SOMEPROJ")
 
     return CommitMessage(
-        technica.default_short(project, ticket_first=True)
+        technica.default_short(project, ticket_first=True),
+        technica.default_long()
     )
 
 
