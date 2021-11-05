@@ -48,6 +48,8 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
             to_stdout(commit())
         ```
 
+        If you're not familiar with Conventional Commits, here's a [quick guide](https://www.conventionalcommits.org/en/v1.0.0/).
+
     - If you need to define your own keywords and commit message template, read [Configuration](https://github.com/kjczarne/mkcommit/wiki/Configuration) in our Wiki.
 
         - If you want to learn how to use the hook mode, read [Hooks](https://github.com/kjczarne/mkcommit/wiki/Hooks) in our Wiki.
