@@ -32,7 +32,7 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 
 ## Configuration
 
-1. At the root of your repository create a Python file named `my_repo.mkcommit.py`.
+1. At the root of your repository create a Python file named `.mkcommit.py`.
 2. Compose the script:
 
     - A built-in _conventional commit_ suite can be used:
