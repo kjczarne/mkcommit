@@ -74,6 +74,8 @@ If you have Python set up, you're good to go. Run `pip install mkcommit` and you
 
 If you wish to point `mkcommit` to a specific configuration file, use `mkcommit -f /path/to/.mkcommit.py`. You can combine the `-f` flag with all the other available flags.
 
+Of course you may use `mkcommit` with [VSCode tasks](https://github.com/kjczarne/mkcommit/wiki/VSCode).
+
 ### Input validation
 
 The most basic validation strategy we use is [validation at the time of message generation](https://github.com/kjczarne/mkcommit/wiki/Validators).
