@@ -27,13 +27,17 @@ def is_float() -> Validator:
     return _v
 
 
+def min_len(limit: int) -> Validator:
+    def _v(msg: str) -> bool:
+        """Checks if the input is at least `limit` characters long"""
+        return len(msg) > limit
+    return _v
+
+
 def max_len(limit: int) -> Validator:
     def _v(msg: str) -> bool:
         """Checks if the input exceeds maximum length"""
-        if len(msg) > limit:
-            return False
-        else:
-            return True
+        return len(msg) < limit
     return _v
 
 
@@ -87,4 +91,13 @@ def is_false() -> Validator:
     def _v(msg: str) -> bool:
         return not is_true()(msg)
     _v.__doc__ = "Was `True`, expected `False`"
+    return _v
+
+
+def are_keywords_selected() -> Validator:
+    def _v(msg: str) -> bool:
+        """Checks if at least one keyword has been selected."""
+        return min_len(1)(msg)
+    _v.__doc__ = """No keywords have been selected. This is not allowed. 
+Use `chore` for generic tasks."""
     return _v
