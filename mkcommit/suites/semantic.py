@@ -1,7 +1,7 @@
 from typing import Callable, List, Tuple
 from mkcommit.model import ValidationFailedException, ask, CommaSeparatedList
 from mkcommit.blocks import Keyword
-from mkcommit.validators import matches, max_len
+from mkcommit.validators import are_keywords_selected, matches, max_len
 from mkcommit.editor_handler import editor
 
 commit_keywords = [
@@ -95,7 +95,8 @@ def has_short_commit_msg_proper_length(s: str) -> bool:
 
 ask_keywords = lambda: ask(
     "Select one or more keywords applicable (use TAB): ",
-    one_or_more=commit_keywords
+    one_or_more=commit_keywords,
+    check=are_keywords_selected()
 )
 
 ask_scope = lambda: ask(
