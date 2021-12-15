@@ -1,4 +1,4 @@
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 from mkcommit.model import *  # noqa: F401,F403
 from mkcommit.main import *  # noqa: F401,F403
