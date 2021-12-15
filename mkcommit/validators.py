@@ -30,7 +30,7 @@ def is_float() -> Validator:
 def min_len(limit: int) -> Validator:
     def _v(msg: str) -> bool:
         """Checks if the input is at least `limit` characters long"""
-        return len(msg) > limit
+        return len(msg) >= limit
     return _v
 
 
