@@ -12,6 +12,7 @@ def _ask(
 ) -> Any:
     answers = {
         "Keyword": Keyword("feat", "Feature"),
+        "Keywords": "Keywords",
         "Your initials": "KrCz",
         "Ticket number": "1234",
         "Short commit message": "cool",
@@ -20,6 +21,7 @@ def _ask(
         "Float Test": "12.0",
         "Regex Test": "match_me",
         "Max Length Test": "this is shorter than 30 chars",
+        "Keywords Invalid": "",
         "Initials": "KrzCza",
         "Integer Test Invalid": "asdf",
         "Float Test Invalid": "qwer",
