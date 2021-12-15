@@ -3,7 +3,9 @@ import re
 
 from mkcommit.fixtures import _ask
 from mkcommit.model import CommitMessage
-from mkcommit.validators import max_len, matches, is_int, is_float, validate_initials
+from mkcommit.validators import (
+    max_len, matches, is_int, is_float, validate_initials, are_keywords_selected
+)
 
 
 class TestValidators(unittest.TestCase):
@@ -14,9 +16,11 @@ class TestValidators(unittest.TestCase):
         some_regex = _ask("Regex Test", check=matches(r'match_me'))
         max_length = _ask("Max Length Test", check=max_len(30))
         initials = _ask("Initials", check=validate_initials(3, 3))
+        kwds = _ask("Keywords", check=are_keywords_selected())
 
         c_valid = CommitMessage(
-            f"{integer}-{floating_point}-{some_regex}-{max_length}-{initials}",
+            f"{integer}-{floating_point}-{some_regex}-{max_length}-{initials}-"
+            f"{kwds}",
             ""
         )
 
@@ -29,10 +33,11 @@ class TestValidators(unittest.TestCase):
         max_length = _ask("Max Length Test Invalid", check=max_len(30))
         initials = _ask("Initials Invalid", check=validate_initials(3, 3))
         initials2 = _ask("Initials Invalid2", check=validate_initials(3, 3))
+        kwds = _ask("Keywords Invalid", check=are_keywords_selected())
 
         c_invalid = CommitMessage(
             f"{integer}-{floating_point}-{some_regex}-{max_length}-{initials}-"
-            f"{initials2}",
+            f"{initials2}-{kwds}",
             ""
         )
 
@@ -48,7 +53,7 @@ class TestValidators(unittest.TestCase):
         """Each invalid input should properly add `INVALID-` fixture prefix."""
         msg = self.make_invalid().first_line
         invalid_bits = re.findall(r'INVALID', msg)
-        self.assertEqual(6, len(invalid_bits))
+        self.assertEqual(7, len(invalid_bits))
 
 
 if __name__ == "__main__":
